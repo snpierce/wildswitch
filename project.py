@@ -1,10 +1,12 @@
-mport os
+import os, csv
 import datetime
+import sqlalchemy as db
 
 
-from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -23,15 +25,15 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///wildswitch.db")
+# set up SQL database
 
-with open("People.csv", "r") as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        db.execute("INSERT INTO people VALUES ?, ?, ?, ?, ?, ?, ?, ?, ?, ?", row["playerID"], row["nameFirst"], row["nameLast"], row["nameGiven"],
-        row["weight"], row["height"], row["bats"], row["throws"], row["debut"], row["finalGame"])
 
+# database engine object from SQLAlchemy that manages connections to the database
+engine = db.create_engine(os.getenv("DATABASE_URL"))
+
+# create a 'scoped session' that ensures different users' interactions with the
+# database are kept separate
+db = scoped_session(sessionmaker(bind=engine))
 
 @app.after_request
 def after_request(response):
@@ -164,4 +166,5 @@ def errorhandler(e):
 # Listen for errors
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
+
 
