@@ -139,7 +139,7 @@ def logout():
 @app.route("/")
 @login_required
 def index():
-       return
+       return render_template("index.html")
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
