@@ -38,6 +38,7 @@ def after_request(response):
 
 
 @app.route("/")
+@login_required
 def index():
     text = cur.execute("SELECT * FROM People WHERE playerID = 'aardsd01a'")
     return render_template("index.html", text=text)
@@ -55,21 +56,22 @@ def login():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            return apology("must provide username", 403)
+            return apology("Must provide username.", 403)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("must provide password", 403)
+            return apology("Must provide password.", 403)
 
         # Query database for username
-        rows = cur.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+        cur.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),))
+        rows = list(cur.fetchall())
 
         # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+        if len(rows) != 1 or not check_password_hash(rows[0][2], request.form.get("password")):
             return apology("invalid username and/or password", 403)
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = rows[0][0]
 
         # Redirect user to home page
         return redirect("/")
@@ -106,12 +108,12 @@ def register():
             return apology("Please enter confirmation.")
 
         # checks if username is already in users table, stores 1 if found, 0 if not
-        x = list(cur.execute("SELECT COUNT(*) AS 'count' FROM Users WHERE username = ?", (request.form.get("username"),)))
-        return apology(x[0])
+        cur.execute("SELECT COUNT(*) AS 'count' FROM Users WHERE username = ?", (request.form.get("username"),))
+        count = float(cur.fetchone()[0])
 
         # if username already in users table, return apology message 
-        if 0 != x[0]["count"]:
-            return apology("Username Taken")
+        if 0.0 != count:
+            return apology("Username taken.")
         
         # checks if password and confirmation match, return apology if don't
         if request.form.get("password") != request.form.get("confirmation"):
@@ -121,14 +123,15 @@ def register():
         hash = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
 
         # if passes all the checks, add username+hash to users table
-        cur.execute("INSERT INTO Users (username, hash) VALUES (?, ?)", (request.form.get("username"),), (hash,))
+        cur.execute("INSERT INTO Users (username, password, cash) VALUES (?, ?, 0.00)", (request.form.get("username"), hash,))
         con.commit()
 
         # return users info for now registered user by searching for username
-        rows = list(cur.execute("SELECT * FROM Users WHERE username = ?", (request.form.get("username"),)))
-        
+        cur.execute("SELECT * FROM Users WHERE username = ?", (request.form.get("username"),))
+        rows = list(cur.fetchall())
+
         # log user into session by id
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = rows[0]
 
         # redirect user to home page
         return redirect("/")
