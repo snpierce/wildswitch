@@ -1,9 +1,13 @@
 import os
 import requests
 import urllib.parse
+import sqlite3
 
 from flask import redirect, render_template, request, session
 from functools import wraps
+
+con = sqlite3.connect("wildswitch.sqlite", check_same_thread=False)
+cur = con.cursor()
 
 # Copied and pasted from PSet9 Finance
 def login_required(f):
@@ -21,4 +25,10 @@ def login_required(f):
 # I guess we'll keep for now while we're working, but we can change it.
 def apology(message, code=400):
     return render_template("apology.html", message=message), code
+
+def generate_card(playerID):
+    cur.execute("SELECT * FROM People WHERE playerID = ?", (playerID,))
+    info = list(cur.fetchall())
+
+    return render_template("market.html", info=info)
 
