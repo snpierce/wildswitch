@@ -44,6 +44,12 @@ def index():
     return render_template("index.html", text=text)
 
 
+@app.route("/buy")
+@login_required
+def buy():
+    return render_template("buy.html")
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""

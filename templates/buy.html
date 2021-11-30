@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <form action="/buy" method="POST">
+        <input type="text" class="form-control col-xs-3" placeholder="Type Here">
+        <br>
+        <select class="form-select col-xs-2">
+            <option>Player ID</option>
+            <option>Player Full Name</option>
+            <option>User</option>
+        </select>
+        <br>
+        <button type="button" class="btn btn-success" type="submit">Search</button>
+    </form>
+{% endblock %}
