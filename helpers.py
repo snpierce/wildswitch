@@ -32,3 +32,17 @@ def generate_card(playerID):
 
     return render_template("market.html", info=info)
 
+def generate_user(username):
+    players = []
+    cur.execute("SELECT * FROM Cards WHERE username = ?", (username,))
+    cards = list(cur.fetchall())
+
+    cur.execute("SELECT playerID FROM Cards WHERE username = ?", (username,))
+    playerIDs = list(cur.fetchall())
+
+    for playerID in playerIDs:
+        cur.execute("SELECT * FROM People WHERE playerID = ?", (playerID,))
+        players.append(list(cur.fetchone()))
+
+    return render_template("user.html", cards=cards, players=players)
+

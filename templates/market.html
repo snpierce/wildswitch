@@ -5,10 +5,14 @@
 {% endblock %}
 
 {% block main %}
-    <p> Player ID: {{ info[0][0] }} </p>
-    <p> Full Name: {{ info[0][3] }} </p>
-    <p> Weight: {{ info[0][4] }} </p>
-    <p> Height: {{ info[0][5] }} </p>
-    <p> Bats: {{ info[0][6] }} </p>
-    <p> Throws: {{ info[0][7] }} </p>
+<div class="card bg-light mb-3" style="max-width: 18rem;">
+    <div class="card-header">Player</div>
+    <div class="card-body">
+      <h5 class="card-title">{{ info[0][1] }}</h5>
+      <p class="card-text"> Weight: {{ info[0][2] }} </p>
+      <p class="card-text"> Height: {{ info[0][3] }} </p>
+      <p class="card-text"> Bats: {{ info[0][4] }} </p>
+      <p class="card-text"> Throws: {{ info[0][5] }} </p>
+    </div>
+  </div>
 {% endblock %}

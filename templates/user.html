@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+{% for player in players %}
+<div class="card bg-light mb-3" style="max-width: 18rem;">
+    <div class="card-header">{{ cards[player][0]}}</div>
+    <div class="card-body">
+      <h5 class="card-title">{{ players[1] }}</h5>
+      <p class="card-text"> Weight: {{ player[2] }} </p>
+      <p class="card-text"> Height: {{ player[3] }} </p>
+      <p class="card-text"> Bats: {{ player[4] }} </p>
+      <p class="card-text"> Throws: {{ player[5] }} </p>
+      <p class="card-text"> Card Value: {{ cards[player][2] }} </p>
+    </div>
+  </div>
+{% endblock %}

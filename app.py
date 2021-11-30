@@ -10,7 +10,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, generate_card
+from helpers import apology, login_required, generate_card, generate_user
 
 # Configure application
 app = Flask(__name__)
@@ -44,9 +44,9 @@ def index():
     return render_template("index.html", text=text)
 
 
-@app.route("/buy", methods=["GET", "POST"])
+@app.route("/search", methods=["GET", "POST"])
 @login_required
-def buy():
+def search():
     if request.method == "POST":
         search = request.form.get("search")
         option = int(request.form.get("criteria"))
@@ -61,10 +61,28 @@ def buy():
                 return generate_card(playerID)
             else:
                 return apology("Not a valid player ID.")
+        elif option == 2:
+            cur.execute("SELECT COUNT(*) FROM People WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
+            count = float(cur.fetchone()[0])
+
+            if count != 0.0:
+                cur.execute("SELECT playerID FROM People WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
+                playerID = cur.fetchone()[0]
+                return generate_card(playerID)
+            else:
+                return apology("Not a valid player name.")
         else:
-            return apology("Error.")
+            cur.execute("SELECT COUNT(*) FROM Users WHERE LOWER(username) LIKE LOWER(?)", (search,))
+            count = float(cur.fetchone()[0])
+
+            if count != 0.0:
+                cur.execute("SELECT username FROM People WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
+                username = cur.fetchone()[0]
+                return generate_user(username)
+            else:
+                return apology("Not a valid player name.")
     else:
-        return render_template("buy.html")
+        return render_template("search.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
