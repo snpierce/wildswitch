@@ -106,7 +106,8 @@ def register():
             return apology("Please enter confirmation.")
 
         # checks if username is already in users table, stores 1 if found, 0 if not
-        x = list(cur.execute("SELECT COUNT(*) AS 'count' FROM Users WHERE username = ?", request.form.get("username")))
+        x = list(cur.execute("SELECT COUNT(*) AS 'count' FROM Users WHERE username = ?", (request.form.get("username"),)))
+        return apology(x[0])
 
         # if username already in users table, return apology message 
         if 0 != x[0]["count"]:
@@ -120,11 +121,11 @@ def register():
         hash = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
 
         # if passes all the checks, add username+hash to users table
-        cur.execute("INSERT INTO Users (username, hash) VALUES (?, ?)", request.form.get("username"), hash)
+        cur.execute("INSERT INTO Users (username, hash) VALUES (?, ?)", (request.form.get("username"),), (hash,))
         con.commit()
 
         # return users info for now registered user by searching for username
-        rows = list(cur.execute("SELECT * FROM Users WHERE username = ?", request.form.get("username")))
+        rows = list(cur.execute("SELECT * FROM Users WHERE username = ?", (request.form.get("username"),)))
         
         # log user into session by id
         session["user_id"] = rows[0]["id"]
