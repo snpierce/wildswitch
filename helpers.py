@@ -44,10 +44,8 @@ def generate_user(username):
         cur.execute("SELECT * FROM People WHERE playerID = ?", (rows[i][0],))
         info = cur.fetchall()
         players.append(info)
-    
-    length = len(players)
 
-    return render_template("user.html", players=players, length=length)
+    return render_template("user.html", players=players)
 
     
 

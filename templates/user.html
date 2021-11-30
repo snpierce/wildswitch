@@ -5,17 +5,20 @@
 {% endblock %}
 
 {% block main %}
+<div class="row">
 {% for player in players %}
-<div class="card bg-light mb-3" style="max-width: 18rem;">
-    <div class="card-header">{{ player }}</div>
-    <div class="card-body">
-      <h5 class="card-title">{{ length }}</h5>
-      <p class="card-text"> Weight: {{ player[2] }} </p>
-      <p class="card-text"> Height: {{ player[3] }} </p>
-      <p class="card-text"> Bats: {{ player[4] }} </p>
-      <p class="card-text"> Throws: {{ player[5] }} </p>
-      <p class="card-text"> Card Value:</p>
+    <div class="card bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">{{ player[0] }}</div>
+        <div class="card-body">
+        <h5 class="card-title">{{ players[0][1] }}</h5>
+        <p class="card-text"> Weight: </p>
+        <p class="card-text"> Height: </p>
+        <p class="card-text"> Bats: </p>
+        <p class="card-text"> Throws: </p>
+        <p class="card-text"> Card Value:</p>
+        </div>
     </div>
-  </div>
+  <br>
   {% endfor %}
+</div>
 {% endblock %}
