@@ -76,8 +76,9 @@ def search():
             count = float(cur.fetchone()[0])
 
             if count != 0.0:
-                cur.execute("SELECT username FROM People WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
+                cur.execute("SELECT username FROM Users WHERE LOWER(username) LIKE LOWER(?)", (search,))
                 username = cur.fetchone()[0]
+
                 return generate_user(username)
             else:
                 return apology("Not a valid player name.")
@@ -104,7 +105,7 @@ def login():
             return apology("Must provide password.", 403)
 
         # Query database for username
-        cur.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),))
+        cur.execute("SELECT * FROM Users WHERE username = ?", (request.form.get("username"),))
         rows = list(cur.fetchall())
 
         # Ensure username exists and password is correct

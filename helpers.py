@@ -38,11 +38,16 @@ def generate_user(username):
     cards = list(cur.fetchall())
 
     cur.execute("SELECT playerID FROM Cards WHERE username = ?", (username,))
-    playerIDs = list(cur.fetchall())
+    rows = cur.fetchall()
 
-    for playerID in playerIDs:
-        cur.execute("SELECT * FROM People WHERE playerID = ?", (playerID,))
-        players.append(list(cur.fetchone()))
+    for i in range(len(rows)):
+        cur.execute("SELECT * FROM People WHERE playerID = ?", (rows[i][0],))
+        info = cur.fetchall()
+        players.append(info)
+    
+    length = len(players)
 
-    return render_template("user.html", cards=cards, players=players)
+    return render_template("user.html", players=players, length=length)
+
+    
 
