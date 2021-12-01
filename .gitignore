@@ -130,3 +130,6 @@ dmypy.json
 
 # OS System
 .DS_Store
+
+# SQLite database
+.sqlite
