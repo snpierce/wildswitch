@@ -35,7 +35,7 @@ def generate_card(playerID):
 def generate_user(username):
     players = []
     cur.execute("SELECT * FROM Cards WHERE username = ?", (username,))
-    cards = list(cur.fetchall())
+    cards = cur.fetchall()
 
     cur.execute("SELECT playerID FROM Cards WHERE username = ?", (username,))
     rows = cur.fetchall()
@@ -45,7 +45,7 @@ def generate_user(username):
         info = cur.fetchall()
         players.append(info)
 
-    return render_template("user.html", players=players)
+    return render_template("user.html", players=players, cards=cards)
 
     
 
