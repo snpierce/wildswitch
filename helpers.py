@@ -34,8 +34,6 @@ def generate_card(playerID):
 
 def generate_user(username):
     players = []
-    cur.execute("SELECT * FROM Cards WHERE username = ?", (username,))
-    cards = cur.fetchall()
 
     cur.execute("SELECT playerID FROM Cards WHERE username = ?", (username,))
     rows = cur.fetchall()
@@ -45,7 +43,11 @@ def generate_user(username):
         info = cur.fetchall()
         players.append(info)
 
-    return render_template("user.html", players=players, cards=cards)
+    return render_template("user.html", players=players)
+
+def usd(value):
+    """Format value as USD."""
+    return f"${value:,.2f}"
 
     
 

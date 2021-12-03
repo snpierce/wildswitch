@@ -10,7 +10,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, generate_card, generate_user
+from helpers import apology, login_required, generate_card, generate_user, usd
 
 # Configure application
 app = Flask(__name__)
@@ -35,6 +35,20 @@ def after_request(response):
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
+
+
+@app.route("/buy")
+@login_required
+def buy():
+    if request.method == "POST":
+         cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
+         cash = int(cur.fetchone())
+         
+    else:
+        cur.execute("SELECT playerID FROM People ORDER BY RAND() LIMIT 5")
+        players = list(cur.fetchall())
+
+        return render_template("buy.html", players=players)
 
 
 @app.route("/")
