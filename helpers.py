@@ -3,6 +3,7 @@ import requests
 import urllib.parse
 import sqlite3
 
+from datetime import date
 from flask import redirect, render_template, request, session
 from functools import wraps
 
@@ -45,9 +46,11 @@ def generate_user(username):
 
     return render_template("user.html", players=players)
 
-def usd(value):
+def usd(amount):
     """Format value as USD."""
+    value = float(amount)
     return f"${value:,.2f}"
+
 
     
 

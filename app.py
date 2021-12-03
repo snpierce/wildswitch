@@ -27,9 +27,12 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+# opens connection to database
 con = sqlite3.connect("wildswitch.sqlite", check_same_thread=False)
 cur = con.cursor()
 
+# create array to hold the market's current cards on sale
+players = []
 
 @app.after_request
 def after_request(response):
@@ -40,17 +43,18 @@ def after_request(response):
     return response
 
 
-@app.route("/buy")
+@app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
     if request.method == "POST":
          cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
-         cash = int(cur.fetchone())
+         cash = int(cur.fetchone()[0])
+
+         player = request.form.get("player")
+         return apology(player)
          
     else:
-        cur.execute("SELECT playerID FROM People ORDER BY RANDOM() LIMIT 5")
-        players = list(cur.fetchall())
-
+        global players
         return render_template("buy.html", players=players)
 
 
@@ -130,7 +134,11 @@ def login():
             return apology("invalid username and/or password", 403)
 
         # Remember which user has logged in
-        session["user_id"] = rows[0][0]
+        session["user_id"] = rows[0][1]
+
+        cur.execute("SELECT * FROM People WHERE status = '0' ORDER BY RANDOM() LIMIT 8")
+        global players 
+        players = list(cur.fetchall())
 
         # Redirect user to home page
         return redirect("/")
@@ -182,7 +190,7 @@ def register():
         hash = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
 
         # if passes all the checks, add username+hash to users table
-        cur.execute("INSERT INTO Users (username, password, cash) VALUES (?, ?, 0.00)", (request.form.get("username"), hash,))
+        cur.execute("INSERT INTO Users (username, password, cash) VALUES (?, ?, 50.00)", (request.form.get("username"), hash,))
         con.commit()
 
         # return users info for now registered user by searching for username
@@ -190,7 +198,7 @@ def register():
         rows = list(cur.fetchall())
 
         # log user into session by id
-        session["user_id"] = rows[0]
+        session["user_id"] = rows[0][1]
 
         # redirect user to home page
         return redirect("/")

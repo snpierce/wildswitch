@@ -1,27 +1,28 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Search
+    Market
 {% endblock %}
 
 {% block main %}
+<h1>Card Market</h1><br><br>
+<form action="/buy" method="post">
 <div class="row">
 {% for player in players %}
-    <div class="card bg-light mb-3" style="max-width: 18rem;">
-        <div class="card-header">{{ player[0][0] }}</div>
+    <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
+        <div name="player" class="card-header">{{ player[0] }}</div>
         <div class="card-body">
-        <h5 class="card-title">{{ player[0][1] }}</h5>
-        <p class="card-text"> Weight: {{ player[0][2] }}</p>
-        <p class="card-text"> Height: {{ player[0][3] }}</p>
-        <p class="card-text"> Bats: {{ player[0][4] }}</p>
-        <p class="card-text"> Throws: {{ player[0][5] }}</p>
-        <p class="card-text"> Card Value: {{ player[0][8] | usd }} </p>
-        <form action="/buy" method="post">
-            <button class="btn btn-primary" type="submit" value="">Buy Card</button>
-        </form>
+        <h5 class="card-title">{{ player[1] }}</h5>
+        <p class="card-text"> Weight: {{ player[2] }}</p>
+        <p class="card-text"> Height: {{ player[3] }}</p>
+        <p class="card-text"> Bats: {{ player[4] }}</p>
+        <p class="card-text"> Throws: {{ player[5] }}</p>
+        <p class="card-text"> Card Value: {{ player[8] | usd }} </p>
+        <p class="card-text"> Discount Cost: {{ (player[8]*0.80) | usd }} </p>
         </div>
     </div>
-  <br>
+</form>
   {% endfor %}
 </div>
+<button class="btn btn-primary" type="submit" >Buy Card</button>
 {% endblock %}
