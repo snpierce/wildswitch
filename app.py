@@ -46,15 +46,29 @@ def after_request(response):
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
+    global players
+
     if request.method == "POST":
          cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
          cash = int(cur.fetchone()[0])
 
-         player = request.form.get("player")
-         return apology(player)
+         player = request.form.get("buy")
+
+         cur.execute("SELECT value FROM People WHERE playerID = ?", (players[player][0],))
+         temp = float(cur.fetchone()[0])
+         cost = temp * 0.8
+
+         if cost > cash:
+             return apology("Can't afford - please add money to account.")
+         else:
+             cur.execute("INSERT INTO Cards (username, playerID, value, status) VALUES (?, ?, ?, ?)", (session["user_id"], players[player][0], temp, '0',))
+             cur.execute("UPDATE Users SET cash = cash - cost WHERE username = ?", (session["user_id"],))
+             cur.execute("UPDATE People SET status = '1' WHERE playerID = ?", (players[player][0],))
+             cur.commit()
+
+         return redirect("/")
          
     else:
-        global players
         return render_template("buy.html", players=players)
 
 
@@ -199,6 +213,10 @@ def register():
 
         # log user into session by id
         session["user_id"] = rows[0][1]
+
+        cur.execute("SELECT * FROM People WHERE status = '0' ORDER BY RANDOM() LIMIT 8")
+        global players 
+        players = list(cur.fetchall())
 
         # redirect user to home page
         return redirect("/")

@@ -6,7 +6,6 @@
 
 {% block main %}
 <h1>Card Market</h1><br><br>
-<form action="/buy" method="post">
 <div class="row">
 {% for player in players %}
     <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
@@ -21,8 +20,22 @@
         <p class="card-text"> Discount Cost: {{ (player[8]*0.80) | usd }} </p>
         </div>
     </div>
-</form>
   {% endfor %}
 </div>
-<button class="btn btn-primary" type="submit" >Buy Card</button>
+<form action="/buy" method="post">
+    <input type="text" class="form-control col-xs-3" placeholder="Select Card" name="buy" required>
+        <br>
+        <select class="form-select col-xs-2" name="criteria">
+                <option value=0>{{ players[0][0] }}</option>
+                <option value=1>{{ players[1][0] }}</option>
+                <option value=2>{{ players[2][0] }}</option>
+                <option value=3>{{ players[3][0] }}</option>
+                <option value=4>{{ players[4][0] }}</option>
+                <option value=5>{{ players[5][0] }}</option>
+                <option value=6>{{ players[6][0] }}</option>
+                <option value=7>{{ players[7][0] }}</option>
+        </select>
+        <br>
+    <button class="btn btn-primary" type="submit" >Buy Card</button>
+</form>
 {% endblock %}
