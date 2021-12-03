@@ -15,6 +15,9 @@ from helpers import apology, login_required, generate_card, generate_user, usd
 # Configure application
 app = Flask(__name__)
 
+# Custom filter
+app.jinja_env.filters["usd"] = usd
+
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
@@ -45,7 +48,7 @@ def buy():
          cash = int(cur.fetchone())
          
     else:
-        cur.execute("SELECT playerID FROM People ORDER BY RAND() LIMIT 5")
+        cur.execute("SELECT playerID FROM People ORDER BY RANDOM() LIMIT 5")
         players = list(cur.fetchall())
 
         return render_template("buy.html", players=players)
