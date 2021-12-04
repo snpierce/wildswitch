@@ -10,7 +10,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, generate_card, generate_user, usd
+from helpers import apology, login_required, generate_card, generate_user, usd, market
 
 # Configure application
 app = Flask(__name__)
@@ -31,8 +31,6 @@ Session(app)
 con = sqlite3.connect("wildswitch.sqlite", check_same_thread=False)
 cur = con.cursor()
 
-# create array to hold the market's current cards on sale
-players = []
 
 @app.after_request
 def after_request(response):
@@ -46,9 +44,10 @@ def after_request(response):
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
-    global players
+    players = market(1)
 
     if request.method == "POST":
+
          cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
          cash = int(cur.fetchone()[0])
 
@@ -71,8 +70,7 @@ def buy():
              cur.execute("UPDATE People SET status = '1' WHERE playerID = ?", (players[player][0],))
              con.commit()
 
-         return redirect("/")
-         
+         return redirect("/")    
     else:
 
         return render_template("buy.html", players=players)
@@ -156,9 +154,8 @@ def login():
         # Remember which user has logged in
         session["user_id"] = rows[0][1]
 
-        cur.execute("SELECT * FROM People WHERE status = '0' ORDER BY RANDOM() LIMIT 8")
-        global players 
-        players = list(cur.fetchall())
+        # create market
+        market(0)
 
         # Redirect user to home page
         return redirect("/")
@@ -222,9 +219,8 @@ def register():
         # log user into session by id
         session["user_id"] = rows[0][1]
 
-        cur.execute("SELECT * FROM People WHERE status = '0' ORDER BY RANDOM() LIMIT 8")
-        global players 
-        players = list(cur.fetchall())
+        # create market
+        market(0)
 
         # redirect user to home page
         return redirect("/")

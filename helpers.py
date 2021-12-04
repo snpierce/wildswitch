@@ -27,12 +27,14 @@ def login_required(f):
 def apology(message, code=400):
     return render_template("apology.html", message=message), code
 
+# generates and returns player information when searched
 def generate_card(playerID):
     cur.execute("SELECT * FROM People WHERE playerID = ?", (playerID,))
     info = list(cur.fetchall())
 
     return render_template("market.html", info=info)
 
+# generates and returns list of searched user's owned player cards
 def generate_user(username):
     players = []
 
@@ -46,10 +48,26 @@ def generate_user(username):
 
     return render_template("user.html", players=players)
 
+# converts amount into usd format
 def usd(amount):
     """Format value as USD."""
     value = float(amount)
     return f"${value:,.2f}"
+
+# command 0 creates a random list of 8 players and stores that group until called with command 0 again
+# command 1 returns the currently stored list
+def market(command):
+    # initialize players
+    cur.execute("SELECT * FROM People WHERE status = '0' ORDER BY RANDOM() LIMIT 8")
+    group = list(cur.fetchall())
+
+    # make a two-step code: create and exit, create and save
+
+   
+        
+
+
+        
 
 
     
