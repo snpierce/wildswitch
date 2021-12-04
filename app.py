@@ -32,7 +32,7 @@ con = sqlite3.connect("wildswitch.sqlite", check_same_thread=False)
 cur = con.cursor()
 
 # create array to hold the market's current cards on sale
-players = [None] * 8
+players = []
 
 @app.after_request
 def after_request(response):
