@@ -70,7 +70,8 @@ def buy():
              cur.execute("UPDATE People SET status = '1' WHERE playerID = ?", (players[player][0],))
              con.commit()
 
-         return redirect("/")    
+             return redirect("/")
+
     else:
 
         return render_template("buy.html", players=players)

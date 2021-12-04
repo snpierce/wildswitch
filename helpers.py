@@ -62,7 +62,7 @@ def market(command):
     group = list(cur.fetchall())
 
     # make a two-step code: create and exit, create and save
-
+    return group
    
         
 
