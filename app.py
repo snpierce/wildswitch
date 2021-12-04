@@ -32,7 +32,7 @@ con = sqlite3.connect("wildswitch.sqlite", check_same_thread=False)
 cur = con.cursor()
 
 # create array to hold the market's current cards on sale
-players = []
+players = [None] * 8
 
 @app.after_request
 def after_request(response):
@@ -52,23 +52,29 @@ def buy():
          cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
          cash = int(cur.fetchone()[0])
 
-         player = request.form.get("buy")
+         player = int(request.form.get("buy"))
 
          cur.execute("SELECT value FROM People WHERE playerID = ?", (players[player][0],))
          temp = float(cur.fetchone()[0])
          cost = temp * 0.8
 
+         cur.execute("SELECT status FROM People WHERE playerID = ?", (players[player][0],))
+         status = int(cur.fetchone()[0])
+
          if cost > cash:
              return apology("Can't afford - please add money to account.")
+         elif status == 1:
+             return apology("Already purchased!")
          else:
-             cur.execute("INSERT INTO Cards (username, playerID, value, status) VALUES (?, ?, ?, ?)", (session["user_id"], players[player][0], temp, '0',))
-             cur.execute("UPDATE Users SET cash = cash - cost WHERE username = ?", (session["user_id"],))
+             cur.execute("INSERT INTO Cards (username, playerID, cardValue, status) VALUES (?, ?, ?, ?)", (session["user_id"], players[player][0], temp, '0',))
+             cur.execute("UPDATE Users SET cash = cash - ? WHERE username = ?", (cost, session["user_id"],))
              cur.execute("UPDATE People SET status = '1' WHERE playerID = ?", (players[player][0],))
-             cur.commit()
+             con.commit()
 
          return redirect("/")
          
     else:
+
         return render_template("buy.html", players=players)
 
 
@@ -176,6 +182,8 @@ def logout():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
+
+    session.clear()
 
     # when register button is clicked
     if request.method == "POST":

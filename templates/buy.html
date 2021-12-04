@@ -23,9 +23,8 @@
   {% endfor %}
 </div>
 <form action="/buy" method="post">
-    <input type="text" class="form-control col-xs-3" placeholder="Select Card" name="buy" required>
         <br>
-        <select class="form-select col-xs-2" name="criteria">
+        <select class="form-select col-xs-2" name="buy">
                 <option value=0>{{ players[0][0] }}</option>
                 <option value=1>{{ players[1][0] }}</option>
                 <option value=2>{{ players[2][0] }}</option>
