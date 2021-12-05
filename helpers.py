@@ -28,11 +28,16 @@ def apology(message, code=400):
     return render_template("apology.html", message=message), code
 
 # generates and returns player information when searched
-def generate_card(playerID):
-    cur.execute("SELECT * FROM People WHERE playerID = ?", (playerID,))
-    info = list(cur.fetchall())
-
-    return render_template("market.html", info=info)
+def generate_card(playerID, command):
+    if command == 1:
+        cur.execute("SELECT * FROM Batting WHERE playerID = ?", (playerID,))
+        players = list(cur.fetchall())
+        return render_template("batter.html", players=players)
+    else:
+        cur.execute("SELECT * FROM Pitching WHERE playerID = ?", (playerID,))
+        players = list(cur.fetchall())
+        return render_template("pitcher.html", players=players)
+    
 
 # generates and returns list of searched user's owned player cards
 def generate_user(username):
@@ -46,7 +51,7 @@ def generate_user(username):
         info = cur.fetchall()
         players.append(info)
 
-    return render_template("user.html", players=players)
+    return render_template("batter.html", players=players)
 
 # converts amount into usd format
 def usd(amount):

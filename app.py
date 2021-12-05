@@ -80,35 +80,37 @@ def buy():
 @app.route("/")
 @login_required
 def index():
-    text = cur.execute("SELECT * FROM People WHERE playerID = 'aardsd01a'")
-    return render_template("index.html", text=text)
+    
+    return render_template("index.html")
 
 
 @app.route("/search", methods=["GET", "POST"])
 @login_required
 def search():
+    
     if request.method == "POST":
         search = request.form.get("search")
         option = int(request.form.get("criteria"))
 
         if option == 1:
-            cur.execute("SELECT COUNT(*) FROM People WHERE LOWER(playerID) LIKE LOWER(?)", (search,))
+            cur.execute("SELECT COUNT(*) FROM Batting WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
             count = float(cur.fetchone()[0])
 
             if count != 0.0:
-                cur.execute("SELECT playerID FROM People WHERE LOWER(playerID) LIKE LOWER(?)", (search,))
+                cur.execute("SELECT playerID FROM Batting WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
                 playerID = cur.fetchone()[0]
-                return generate_card(playerID)
+                return generate_card(playerID, 1)
             else:
                 return apology("Not a valid player ID.")
+
         elif option == 2:
-            cur.execute("SELECT COUNT(*) FROM People WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
+            cur.execute("SELECT COUNT(*) FROM Pitching WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
             count = float(cur.fetchone()[0])
 
             if count != 0.0:
-                cur.execute("SELECT playerID FROM People WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
+                cur.execute("SELECT playerID FROM Pitching WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
                 playerID = cur.fetchone()[0]
-                return generate_card(playerID)
+                return generate_card(playerID, 0)
             else:
                 return apology("Not a valid player name.")
         else:

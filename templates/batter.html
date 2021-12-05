@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block main %}
+<div class="row">
+{% for player in players %}
+    <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
+        <div class="card-header">{{ player[16] }} - {{ player[1] }}</div>
+        <div class="card-body">
+        <p class="card-title">Games: {{ player[5] }} At Bats: {{ player[6] }}</p>
+        <p class="card-text">Hits: {{ player[8] }} Doubles: {{ player[9] }}</p>
+        <p class="card-text">Triples: {{ player[10] }} HR: {{ player[11] }}</p>
+        <p class="card-text">Runs: {{ player[7] }} RBIs: {{ player[12] }}</p>
+        <p class="card-text"> {{ player[17] }}</p>
+        </div>
+    </div>
+  <br> <br>
+  {% endfor %}
+</div>
+{% endblock %}
