@@ -61,7 +61,7 @@ def usd(amount):
 
 # command 0 creates a random list of 8 players and stores that group until called with command 0 again
 # command 1 returns the currently stored list
-def market(command):
+def market():
     # initialize players
     cur.execute("SELECT * FROM People WHERE status = '0' ORDER BY RANDOM() LIMIT 8")
     group = list(cur.fetchall())

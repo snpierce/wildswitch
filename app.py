@@ -44,7 +44,7 @@ def after_request(response):
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
-    players = market(1)
+    players = market()
 
     if request.method == "POST":
 
@@ -53,21 +53,24 @@ def buy():
 
          player = int(request.form.get("buy"))
 
-         cur.execute("SELECT value FROM People WHERE playerID = ?", (players[player][0],))
-         temp = float(cur.fetchone()[0])
-         cost = temp * 0.8
+         cur.execute("SELECT * FROM People WHERE playerID = ?", players[player][0])
+         value = float(cur.fetchone()[8])
+         status = int(cur.fetchone()[9])
+         position = int(cur.fetchone()[10])
 
-         cur.execute("SELECT status FROM People WHERE playerID = ?", (players[player][0],))
-         status = int(cur.fetchone()[0])
-
-         if cost > cash:
+         if value > cash:
              return apology("Can't afford - please add money to account.")
          elif status == 1:
              return apology("Already purchased!")
          else:
-             cur.execute("INSERT INTO Cards (username, playerID, cardValue, status) VALUES (?, ?, ?, ?)", (session["user_id"], players[player][0], temp, '0',))
-             cur.execute("UPDATE Users SET cash = cash - ? WHERE username = ?", (cost, session["user_id"],))
+             cur.execute("INSERT INTO Cards (username, playerID, cardValue, status, fullName) VALUES (?, ?, ?, ?, ?)", 
+             (session["user_id"], players[player][0], value, '0', position))
+             cur.execute("UPDATE Users SET cash = cash - ? WHERE username = ?", (value, session["user_id"],))
              cur.execute("UPDATE People SET status = '1' WHERE playerID = ?", (players[player][0],))
+             if position == 1:
+                 cur.execute("UPDATE Batting SET status = '1' WHERE playerID = ?", (players[player][0],))
+             else:
+                 cur.execute("UPDATE Pitching SET status = '1' WHERE playerID = ?", (players[player][0],))
              con.commit()
 
              return redirect("/")
