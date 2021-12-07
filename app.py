@@ -160,9 +160,6 @@ def login():
         # Remember which user has logged in
         session["user_id"] = rows[0][1]
 
-        # create market
-        market(0)
-
         # Redirect user to home page
         return redirect("/")
 
@@ -224,9 +221,6 @@ def register():
 
         # log user into session by id
         session["user_id"] = rows[0][1]
-
-        # create market
-        market(0)
 
         # redirect user to home page
         return redirect("/")
