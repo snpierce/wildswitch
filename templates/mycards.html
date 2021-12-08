@@ -19,8 +19,10 @@
         <!-- this would either require updating the users table (very doable, but maybe unnecessary
             or somehow passing in extra info)-->
             <td class="text-start">{{ cardCount }} </td>
-            <td class="text-start">{{ cash || usd }} </td>
-
+            <td class="text-start">{{ cash | usd }} </td>
+        </tr>
+    </tbody>
+</table>
 <h1>My Cards</h1><br><br>
 <h2>Batters</h2>
 <div class="row">
@@ -64,3 +66,4 @@ WHERE username = ?”, session{“user_id”]) -->
       <br> <br>
     {% endfor %}
 </div>
+{% endblock %}

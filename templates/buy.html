@@ -7,19 +7,18 @@
 {% block main %}
 <h1>Card Market</h1><br><br>
 <div class="row">
-{% for player in players %}
+    {% for player in players %}
     <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
-        <div name="player" class="card-header">{{ player[0] }}</div>
+        <div class="card-header">{{ player[16] }} - {{ player[1] }}</div>
         <div class="card-body">
-        <h5 class="card-title">{{ player[1] }}</h5>
-        <p class="card-text"> Weight: {{ player[2] }}</p>
-        <p class="card-text"> Height: {{ player[3] }}</p>
-        <p class="card-text"> Bats: {{ player[4] }}</p>
-        <p class="card-text"> Throws: {{ player[5] }}</p>
-        <p class="card-text"> Card Value: {{ player[8] | usd }} </p>
-        <p class="card-text"> Discount Cost: {{ (player[8]*0.80) | usd }} </p>
+        <p class="card-title">Games: {{ player[5] }} At Bats: {{ player[6] }}</p>
+        <p class="card-text">Hits: {{ player[8] }} Doubles: {{ player[9] }}</p>
+        <p class="card-text">Triples: {{ player[10] }} HR: {{ player[11] }}</p>
+        <p class="card-text">Runs: {{ player[7] }} RBIs: {{ player[12] }}</p>
+        <p class="card-text"> {{ player[17] }}</p>
         </div>
     </div>
+  <br> <br>
   {% endfor %}
 </div>
 <form action="/buy" method="post">

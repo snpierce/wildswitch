@@ -10,7 +10,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, generate_card, generate_user, usd, market
+from helpers import apology, login_required, generate_card, generate_user, usd, build_market
 
 # Configure application
 app = Flask(__name__)
@@ -44,7 +44,6 @@ def after_request(response):
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
-    players = market()
 
     if request.method == "POST":
 
@@ -53,33 +52,48 @@ def buy():
 
          player = int(request.form.get("buy"))
 
-         cur.execute("SELECT * FROM People WHERE playerID = ?", players[player][0])
-         value = float(cur.fetchone()[8])
-         status = int(cur.fetchone()[9])
-         position = int(cur.fetchone()[10])
+         cur.execute("SELECT * FROM Market")
+         players = list(cur.fetchall())
+         selected = players[player]
 
-         if value > cash:
+         if selected[5] > cash:
              return apology("Can't afford - please add money to account.")
-         elif status == 1:
+         elif selected[4] == 1:
              return apology("Already purchased!")
          else:
-             cur.execute("INSERT INTO Cards (username, playerID, cardValue, status, position) VALUES (?, ?, ?, ?, ?)", 
-             (session["user_id"], players[player][0], value, '0', position))
-             cur.execute("UPDATE Users SET cash = cash - ? WHERE username = ?", (value, session["user_id"],))
-             cur.execute("UPDATE People SET status = '1' WHERE playerID = ?", (players[player][0],))
-             if position == 1:
-                 cur.execute("UPDATE Batting SET status = '1' WHERE playerID = ?", (players[player][0],))
+             # adds bought card into cards table
+             cur.execute("INSERT INTO Cards (username, playerID, cardValue, status, position, year) VALUES (?, ?, ?, ?, ?, ?)", (session["user_id"], selected[0], selected[5], '0', selected[3], selected[2],))
+             # subtracts card cost from users total cash supply
+             cur.execute("UPDATE Users SET cash = cash - ? WHERE username = ?", (selected[5], session["user_id"],))
+             # updates status in market to mean bought
+             cur.execute("UPDATE Market SET status = '1' WHERE playerID = ?", (selected[0],))
+
+             # updates status to mean owned for whichever table the card resides in
+             if selected[3] == 1:
+                 cur.execute("UPDATE Batting SET status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
              else:
-                 cur.execute("UPDATE Pitching SET status = '1' WHERE playerID = ?", (players[player][0],))
+                 cur.execute("UPDATE Pitching SET status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
              con.commit()
 
-             return redirect("/")
+             return redirect("/mycards")
 
     else:
+        players = []
+
+        cur.execute("SELECT playerID, year, position FROM Market")
+        market = list(cur.fetchall())
+
+        for i in range(len(market)):
+            if market[i][2] == 1:
+                cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (market[i][0], market[i][1],))
+                players.append(cur.fetchone())
+            else:
+                cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (market[i][0], market[i][1],))
+                players.append(cur.fetchone())
 
         return render_template("buy.html", players=players)
 
-app.route("/mycards", methods=["GET", "POST"])
+@app.route("/mycards", methods=["GET", "POST"])
 @login_required
 def mycards():
 
@@ -87,11 +101,22 @@ def mycards():
          
          cur.execute("UPDATE Users SET cash = ? WHERE username = ?", )
     else:
-        cur.execute("SELECT * FROM Batting WHERE playerID IN (SELECT playerID FROM Cards WHERE username = ?)", (session["user_id"],))
-        batters = list(cur.fetchall())
+        batters = []
+        pitchers = []
 
-        cur.execute("SELECT * FROM Pitching WHERE playerID IN (SELECT playerID FROM Cards WHERE username = ?)", (session["user_id"],))
-        pitchers = list(cur.fetchall())
+        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 1", (session["user_id"],))
+        batterInfo = list(cur.fetchall())
+
+        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 0", (session["user_id"],))
+        pitcherInfo = list(cur.fetchall())
+
+        for i in range(len(batterInfo)):
+            cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (batterInfo[i][0], batterInfo[i][1],))
+            batters.append(list(cur.fetchall()))
+        
+        for i in range(len(pitcherInfo)):
+            cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
+            pitchers.append(list(cur.fetchall()))
 
         cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
         cash = int(cur.fetchone()[0])
@@ -181,6 +206,9 @@ def login():
         # Remember which user has logged in
         session["user_id"] = rows[0][1]
 
+        # generates market
+        build_market()
+
         # Redirect user to home page
         return redirect("/")
 
@@ -195,6 +223,9 @@ def logout():
 
     # Forget any user_id
     session.clear()
+
+    cur.execute("DELETE FROM Market")
+    con.commit()
 
     # Redirect user to login form
     return redirect("/")
@@ -242,6 +273,9 @@ def register():
 
         # log user into session by id
         session["user_id"] = rows[0][1]
+
+        # generates market
+        build_market()
 
         # redirect user to home page
         return redirect("/")

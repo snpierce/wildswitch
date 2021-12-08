@@ -61,15 +61,21 @@ def usd(amount):
 
 # command 0 creates a random list of 8 players and stores that group until called with command 0 again
 # command 1 returns the currently stored list
-def market():
+def build_market():
     # initialize players
-    cur.execute("SELECT * FROM People WHERE status = '0' ORDER BY RANDOM() LIMIT 8")
-    group = list(cur.fetchall())
+    cur.execute("SELECT * FROM Pitching WHERE status = '0' ORDER BY RANDOM() LIMIT 4")
+    pitcherGroup = list(cur.fetchall())
 
+    cur.execute("SELECT * FROM Batting WHERE status = '0' ORDER BY RANDOM() LIMIT 4")
+    batterGroup = list(cur.fetchall())
     # make a two-step code: create and exit, create and save
-    return group
-   
-        
+    for i in range(4):
+        cur.execute("INSERT INTO Market (playerID, fullName, year, position, status, value) VALUES (?, ?, ?, 0, ?, ?)", (pitcherGroup[i][0], pitcherGroup[i][22], pitcherGroup[i][1], pitcherGroup[i][24], pitcherGroup[i][25],))
+
+    for i in range(4):
+        cur.execute("INSERT INTO Market (playerID, fullName, year, position, status, value) VALUES (?, ?, ?, 1, ?, ?)", (batterGroup[i][0], batterGroup[i][16], batterGroup[i][1], batterGroup[i][18], batterGroup[i][19],))
+
+    con.commit()
 
 
         
