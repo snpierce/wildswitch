@@ -22,9 +22,11 @@ nav .navbar-brand .green
     color: #2e944b;
 }
 
-card {
-    margin-left: 20px;
-    margin-right: 20px;
+card, p, card-header {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: rgb(3, 3, 3);
+    font-family: "Optima", sans-serif;
 }
 
 .type {
@@ -37,10 +39,9 @@ card {
     color: blue;
 }
 
-h1 {
-    color: navy;
-    font-style: italic;
-    font-family: "Lobster", cursive;;
+h1, card-text, h2, li {
+    color: rgb(3, 3, 3);
+    font-family: "Optima", sans-serif;
 }
 
 body {
@@ -59,8 +60,6 @@ ul {
     text-align: center;
     list-style-position: inside;
     color: black;
-    font-weight: bold;
-    font-family: fantasy;
     height: 30%;
     padding-right: 20%;
     padding-left: 20%;
@@ -71,5 +70,19 @@ a {
     list-style-position: inside;
     color: black;
     font-weight: bold;
-    font-family: fantasy;
+}
+
+.row {
+    display: flex;
+}
+
+.column {
+    flex: 50%;
+    padding: 10px;
+    text-align: left;
+}
+
+.form-select {
+    width: 300px;
+    margin: auto;
 }

@@ -78,7 +78,8 @@ def buy():
              return redirect("/mycards")
 
     else:
-        players = []
+        batters = []
+        pitchers = []
 
         cur.execute("SELECT playerID, year, position FROM Market")
         market = list(cur.fetchall())
@@ -86,12 +87,12 @@ def buy():
         for i in range(len(market)):
             if market[i][2] == 1:
                 cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (market[i][0], market[i][1],))
-                players.append(cur.fetchone())
+                batters.append(cur.fetchone())
             else:
                 cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (market[i][0], market[i][1],))
-                players.append(cur.fetchone())
+                pitchers.append(cur.fetchone())
 
-        return render_template("buy.html", players=players)
+        return render_template("buy.html", batters=batters, pitchers=pitchers)
 
 @app.route("/mycards", methods=["GET", "POST"])
 @login_required

@@ -6,34 +6,66 @@
 
 {% block main %}
 <h1>Card Market</h1><br><br>
+<form action="/buy" method="post">
+  <br>
+  <select class="form-select col-xs-2" name="buy">
+          <option value=0>{{ batters[0][2] }}</option>
+          <option value=1>{{ batters[1][2] }}</option>
+          <option value=2>{{ batters[2][2] }}</option>
+          <option value=3>{{ batters[3][2] }}</option>
+          <option value=4>{{ pitchers[0][2] }}</option>
+          <option value=5>{{ pitchers[1][2] }}</option>
+          <option value=6>{{ pitchers[2][2] }}</option>
+          <option value=7>{{ pitchers[3][2] }}</option>
+  </select>
+  <br>
+<button class="btn btn-primary" type="submit" >Buy Card</button>
+</form>
+<br> <br>
 <div class="row">
-    {% for player in players %}
+    {% for batter in batters %}
     <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
-        <div class="card-header">{{ player[16] }} - {{ player[1] }}</div>
-        <div class="card-body">
-        <p class="card-title">Games: {{ player[5] }} At Bats: {{ player[6] }}</p>
-        <p class="card-text">Hits: {{ player[8] }} Doubles: {{ player[9] }}</p>
-        <p class="card-text">Triples: {{ player[10] }} HR: {{ player[11] }}</p>
-        <p class="card-text">Runs: {{ player[7] }} RBIs: {{ player[12] }}</p>
-        <p class="card-text"> {{ player[17] }}</p>
+        <div class="card-header" style="font-family: 'Optima', sans-serif;">{{ batter[2] }} - {{ batter[1] }}</div>
+        <div class="card-body row">
+          <div class="column">
+            <p class="card-text">Games: {{ batter[5] }}  </p>
+            <p class="card-text">Hits: {{ batter[8] }}  </p>
+            <p class="card-text">Triples: {{ batter[10] }}  </p>
+            <p class="card-text">Runs: {{ batter[7] }}  </p>
+          </div>
+          <div class="column">
+            <p class="card-text">At Bats: {{ batter[6] }}</p>
+            <p class="card-text">Doubles: {{ batter[9] }}</p>
+            <p class="card-text">HR: {{ batter[11] }}</p>
+            <p class="card-text">RBIs: {{ batter[12] }}</p>
+          </div>
+          <p class="card-text">{{ batter[17] }}</p>
+          <p class="card-text">{{ batter[18] | usd }}</p>
         </div>
     </div>
+    <br> <br>
+  {% endfor %}
+  {% for pitcher in pitchers %}
+  <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
+    <div class="card-header" style="font-family: 'Optima', sans-serif;">{{ pitcher[2] }} - {{ pitcher[1] }}</div>
+    <div class="card-body row">
+      <div class="column">
+        <p class="card-text">Games: {{ pitcher[7] }}  </p>
+        <p class="card-text">ERA: {{ pitcher[17] }}  </p>
+        <p class="card-text">Strikeouts: {{ pitcher[16] }}  </p>
+        <p class="card-text">HR: {{ pitcher[13] }}  </p>
+      </div>
+      <div class="column">
+        <p class="card-text">W-L: {{ pitcher[5] }}-{{ pitcher[6] }}</p>
+        <p class="card-text">Hits: {{ pitcher[12] }}</p>
+        <p class="card-text">Walks: {{ pitcher[14] }}</p>
+        <p class="card-text">Batters Faced: {{ pitcher[20] }}</p>
+      </div>
+      <p class="card-text">{{ pitcher[23] }}</p>
+      <p class="card-text">{{ pitcher[24] | usd }}</p>
+    </div>
+  </div>
   <br> <br>
   {% endfor %}
 </div>
-<form action="/buy" method="post">
-        <br>
-        <select class="form-select col-xs-2" name="buy">
-                <option value=0>{{ players[0][0] }}</option>
-                <option value=1>{{ players[1][0] }}</option>
-                <option value=2>{{ players[2][0] }}</option>
-                <option value=3>{{ players[3][0] }}</option>
-                <option value=4>{{ players[4][0] }}</option>
-                <option value=5>{{ players[5][0] }}</option>
-                <option value=6>{{ players[6][0] }}</option>
-                <option value=7>{{ players[7][0] }}</option>
-        </select>
-        <br>
-    <button class="btn btn-primary" type="submit" >Buy Card</button>
-</form>
 {% endblock %}
