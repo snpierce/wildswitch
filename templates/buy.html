@@ -9,20 +9,42 @@
 <form action="/buy" method="post">
   <br>
   <select class="form-select col-xs-2" name="buy">
-          <option value=0>{{ batters[0][2] }}</option>
-          <option value=1>{{ batters[1][2] }}</option>
-          <option value=2>{{ batters[2][2] }}</option>
-          <option value=3>{{ batters[3][2] }}</option>
-          <option value=4>{{ pitchers[0][2] }}</option>
-          <option value=5>{{ pitchers[1][2] }}</option>
-          <option value=6>{{ pitchers[2][2] }}</option>
-          <option value=7>{{ pitchers[3][2] }}</option>
+          <option value=0>{{ pitchers[0][2] }}</option>
+          <option value=1>{{ pitchers[1][2] }}</option>
+          <option value=2>{{ pitchers[2][2] }}</option>
+          <option value=3>{{ pitchers[3][2] }}</option>
+          <option value=4>{{ batters[0][2] }}</option>
+          <option value=5>{{ batters[1][2] }}</option>
+          <option value=6>{{ batters[2][2] }}</option>
+          <option value=7>{{ batters[3][2] }}</option>
   </select>
   <br>
 <button class="btn btn-danger" type="submit" >Buy Card</button>
 </form>
 <br> <br>
 <div class="row">
+  {% for pitcher in pitchers %}
+  <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
+    <div class="card-header" style="font-family: 'Optima', sans-serif;">{{ pitcher[2] }} - {{ pitcher[1] }}</div>
+    <div class="card-body row">
+      <div class="column">
+        <p class="card-text">Games: {{ pitcher[7] }}  </p>
+        <p class="card-text">ERA: {{ pitcher[17] }}  </p>
+        <p class="card-text">SO: {{ pitcher[16] }}  </p>
+        <p class="card-text">HR: {{ pitcher[13] }}  </p>
+      </div>
+      <div class="column">
+        <p class="card-text">W-L: {{ pitcher[5] }}-{{ pitcher[6] }}</p>
+        <p class="card-text">Hits: {{ pitcher[12] }}</p>
+        <p class="card-text">Walks: {{ pitcher[14] }}</p>
+        <p class="card-text">HBP: {{ pitcher[19] }}</p>
+      </div>
+      <p class="card-text">{{ pitcher[22] }}</p>
+      <p class="card-text">{{ pitcher[23] | usd }}</p>
+    </div>
+  </div>
+  <br> <br>
+  {% endfor %}
     {% for batter in batters %}
     <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
         <div class="card-header" style="font-family: 'Optima', sans-serif;">{{ batter[2] }} - {{ batter[1] }}</div>
@@ -44,28 +66,6 @@
         </div>
     </div>
     <br> <br>
-  {% endfor %}
-  {% for pitcher in pitchers %}
-  <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
-    <div class="card-header" style="font-family: 'Optima', sans-serif;">{{ pitcher[2] }} - {{ pitcher[1] }}</div>
-    <div class="card-body row">
-      <div class="column">
-        <p class="card-text">Games: {{ pitcher[7] }}  </p>
-        <p class="card-text">ERA: {{ pitcher[17] }}  </p>
-        <p class="card-text">X-outs: {{ pitcher[16] }}  </p>
-        <p class="card-text">HR: {{ pitcher[13] }}  </p>
-      </div>
-      <div class="column">
-        <p class="card-text">W-L: {{ pitcher[5] }}-{{ pitcher[6] }}</p>
-        <p class="card-text">Hits: {{ pitcher[12] }}</p>
-        <p class="card-text">Walks: {{ pitcher[14] }}</p>
-        <p class="card-text"># Faced: {{ pitcher[20] }}</p>
-      </div>
-      <p class="card-text">{{ pitcher[22] }}</p>
-      <p class="card-text">{{ pitcher[23] | usd }}</p>
-    </div>
-  </div>
-  <br> <br>
   {% endfor %}
 </div>
 {% endblock %}

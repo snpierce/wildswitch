@@ -3,7 +3,6 @@ import datetime
 import sqlite3
 import jinja2
 
-
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
@@ -30,6 +29,7 @@ Session(app)
 # opens connection to database
 con = sqlite3.connect("wildswitch.sqlite", check_same_thread=False)
 cur = con.cursor()
+
 
 
 @app.after_request
@@ -110,11 +110,11 @@ def mycards():
 
         cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 0", (session["user_id"],))
         pitcherInfo = list(cur.fetchall())
-        return apology(batterInfo[0][1])
 
         for i in range(len(batterInfo)):
             cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (batterInfo[i][0], batterInfo[i][1],))
             batters.append(list(cur.fetchall()))
+
         
         for i in range(len(pitcherInfo)):
             cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
@@ -126,7 +126,7 @@ def mycards():
         cur.execute("SELECT COUNT(*) FROM Cards WHERE username = ?", (session["user_id"],))
         cardCount = int(cur.fetchone()[0])
         
-        return render_template("mycards.html", batters=batters, pitchers=pitchers, cash=cash, cardCount=cardCount)
+        return render_template("mycards.html", batters=batters, pitchers=pitchers, cash=cash, cardCount=cardCount, username=session["user_id"])
 
 @app.route("/")
 @login_required
@@ -152,7 +152,7 @@ def search():
                 playerID = cur.fetchone()[0]
                 return generate_card(playerID, 1)
             else:
-                return apology("Not a valid player ID.")
+                return apology("Not a valid player name.")
 
         elif option == 2:
             cur.execute("SELECT COUNT(*) FROM Pitching WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
@@ -225,9 +225,6 @@ def logout():
 
     # Forget any user_id
     session.clear()
-
-    cur.execute("DELETE FROM Market")
-    con.commit()
 
     # Redirect user to login form
     return redirect("/")

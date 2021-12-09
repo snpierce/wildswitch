@@ -5,19 +5,28 @@
 {% endblock %}
 
 {% block main %}
-<div class="row">
-{% for player in players %}
-    <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
-        <div class="card-header">{{ player[16] }} - {{ player[1] }}</div>
-        <div class="card-body">
-        <p class="card-title">Games: {{ player[5] }} At Bats: {{ player[6] }}</p>
-        <p class="card-text">Hits: {{ player[8] }} Doubles: {{ player[9] }}</p>
-        <p class="card-text">Triples: {{ player[10] }} HR: {{ player[11] }}</p>
-        <p class="card-text">Runs: {{ player[7] }} RBIs: {{ player[12] }}</p>
-        <p class="card-text"> {{ player[17] }} </p>
+    <div class="row">
+        {% for batter in batters %}
+        <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
+            <div class="card-header" style="font-family: 'Optima', sans-serif;">{{ batter[2] }} - {{ batter[1] }}</div>
+            <div class="card-body row">
+              <div class="column">
+                <p class="card-text">Games: {{ batter[5] }}  </p>
+                <p class="card-text">Hits: {{ batter[8] }}  </p>
+                <p class="card-text">Triples: {{ batter[10] }}  </p>
+                <p class="card-text">Runs: {{ batter[7] }}  </p>
+              </div>
+              <div class="column">
+                <p class="card-text">At Bats: {{ batter[6] }}</p>
+                <p class="card-text">Doubles: {{ batter[9] }}</p>
+                <p class="card-text">HR: {{ batter[11] }}</p>
+                <p class="card-text">RBIs: {{ batter[12] }}</p>
+              </div>
+              <p class="card-text">{{ batter[16] }}</p>
+              <p class="card-text">{{ batter[17] | usd }}</p>
+            </div>
         </div>
-    </div>
-  <br> <br>
-  {% endfor %}
+        <br> <br>
+      {% endfor %}
 </div>
 {% endblock %}

@@ -32,26 +32,42 @@ def generate_card(playerID, command):
     if command == 1:
         cur.execute("SELECT * FROM Batting WHERE playerID = ?", (playerID,))
         players = list(cur.fetchall())
-        return render_template("batter.html", players=players)
+
+        return render_template("batter.html", batters=players)
     else:
         cur.execute("SELECT * FROM Pitching WHERE playerID = ?", (playerID,))
         players = list(cur.fetchall())
-        return render_template("pitcher.html", players=players)
+
+        return render_template("pitcher.html", pitchers=players)
     
 
 # generates and returns list of searched user's owned player cards
 def generate_user(username):
-    players = []
+        batters = []
+        pitchers = []
 
-    cur.execute("SELECT playerID FROM Cards WHERE username = ?", (username,))
-    rows = cur.fetchall()
+        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 1", (username,))
+        batterInfo = list(cur.fetchall())
 
-    for i in range(len(rows)):
-        cur.execute("SELECT * FROM People WHERE playerID = ?", (rows[i][0],))
-        info = cur.fetchall()
-        players.append(info)
+        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 0", (username,))
+        pitcherInfo = list(cur.fetchall())
 
-    return render_template("batter.html", players=players)
+        for i in range(len(batterInfo)):
+            cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (batterInfo[i][0], batterInfo[i][1],))
+            batters.append(list(cur.fetchall()))
+
+        
+        for i in range(len(pitcherInfo)):
+            cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
+            pitchers.append(list(cur.fetchall()))
+
+        cur.execute("SELECT cash FROM Users WHERE username = ?", (username,))
+        cash = int(cur.fetchone()[0])
+
+        cur.execute("SELECT COUNT(*) FROM Cards WHERE username = ?", (username,))
+        cardCount = int(cur.fetchone()[0])
+        
+        return render_template("mycards.html", batters=batters, pitchers=pitchers, cash=cash, cardCount=cardCount, username=username)
 
 # converts amount into usd format
 def usd(amount):
@@ -62,6 +78,10 @@ def usd(amount):
 # command 0 creates a random list of 8 players and stores that group until called with command 0 again
 # command 1 returns the currently stored list
 def build_market():
+     # clears previous market
+    cur.execute("DELETE FROM Market")
+    con.commit()
+
     # initialize players
     cur.execute("SELECT * FROM Pitching WHERE status = '0' ORDER BY RANDOM() LIMIT 4")
     pitcherGroup = list(cur.fetchall())
