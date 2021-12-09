@@ -39,7 +39,7 @@ card, p, card-header {
     color: blue;
 }
 
-h1, card-text, h2, li {
+h1, card-text, h2, li, input, option {
     color: rgb(3, 3, 3);
     font-family: "Optima", sans-serif;
 }
@@ -85,4 +85,9 @@ a {
 .form-select {
     width: 300px;
     margin: auto;
+}
+
+.form {
+    color: rgb(82, 79, 79);
+    font-family: "Optima", sans-serif;
 }

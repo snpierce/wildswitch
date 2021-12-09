@@ -70,10 +70,10 @@ def build_market():
     batterGroup = list(cur.fetchall())
     # make a two-step code: create and exit, create and save
     for i in range(4):
-        cur.execute("INSERT INTO Market (playerID, fullName, year, position, status, value) VALUES (?, ?, ?, 0, ?, ?)", (pitcherGroup[i][0], pitcherGroup[i][22], pitcherGroup[i][1], pitcherGroup[i][24], pitcherGroup[i][25],))
+        cur.execute("INSERT INTO Market (playerID, fullName, year, position, status, value) VALUES (?, ?, ?, 0, ?, ?)", (pitcherGroup[i][0], pitcherGroup[i][22], pitcherGroup[i][1], pitcherGroup[i][23], pitcherGroup[i][24],))
 
     for i in range(4):
-        cur.execute("INSERT INTO Market (playerID, fullName, year, position, status, value) VALUES (?, ?, ?, 1, ?, ?)", (batterGroup[i][0], batterGroup[i][16], batterGroup[i][1], batterGroup[i][18], batterGroup[i][19],))
+        cur.execute("INSERT INTO Market (playerID, fullName, year, position, status, value) VALUES (?, ?, ?, 1, ?, ?)", (batterGroup[i][0], batterGroup[i][16], batterGroup[i][1], batterGroup[i][17], batterGroup[i][18],))
 
     con.commit()
 

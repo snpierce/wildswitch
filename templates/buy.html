@@ -19,7 +19,7 @@
           <option value=7>{{ pitchers[3][2] }}</option>
   </select>
   <br>
-<button class="btn btn-primary" type="submit" >Buy Card</button>
+<button class="btn btn-danger" type="submit" >Buy Card</button>
 </form>
 <br> <br>
 <div class="row">
@@ -39,8 +39,8 @@
             <p class="card-text">HR: {{ batter[11] }}</p>
             <p class="card-text">RBIs: {{ batter[12] }}</p>
           </div>
-          <p class="card-text">{{ batter[17] }}</p>
-          <p class="card-text">{{ batter[18] | usd }}</p>
+          <p class="card-text">{{ batter[16] }}</p>
+          <p class="card-text">{{ batter[17] | usd }}</p>
         </div>
     </div>
     <br> <br>
@@ -52,17 +52,17 @@
       <div class="column">
         <p class="card-text">Games: {{ pitcher[7] }}  </p>
         <p class="card-text">ERA: {{ pitcher[17] }}  </p>
-        <p class="card-text">Strikeouts: {{ pitcher[16] }}  </p>
+        <p class="card-text">X-outs: {{ pitcher[16] }}  </p>
         <p class="card-text">HR: {{ pitcher[13] }}  </p>
       </div>
       <div class="column">
         <p class="card-text">W-L: {{ pitcher[5] }}-{{ pitcher[6] }}</p>
         <p class="card-text">Hits: {{ pitcher[12] }}</p>
         <p class="card-text">Walks: {{ pitcher[14] }}</p>
-        <p class="card-text">Batters Faced: {{ pitcher[20] }}</p>
+        <p class="card-text"># Faced: {{ pitcher[20] }}</p>
       </div>
-      <p class="card-text">{{ pitcher[23] }}</p>
-      <p class="card-text">{{ pitcher[24] | usd }}</p>
+      <p class="card-text">{{ pitcher[22] }}</p>
+      <p class="card-text">{{ pitcher[23] | usd }}</p>
     </div>
   </div>
   <br> <br>

@@ -110,13 +110,14 @@ def mycards():
 
         cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 0", (session["user_id"],))
         pitcherInfo = list(cur.fetchall())
+        return apology(batterInfo[0][1])
 
         for i in range(len(batterInfo)):
             cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (batterInfo[i][0], batterInfo[i][1],))
             batters.append(list(cur.fetchall()))
         
         for i in range(len(pitcherInfo)):
-            cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
+            cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
             pitchers.append(list(cur.fetchall()))
 
         cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
