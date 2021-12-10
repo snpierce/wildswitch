@@ -78,8 +78,39 @@ def sell():
 
             return redirect("/mycards")
 
-        elif 'auction' in request.data:
-            return redirect("/")
+        else:
+            # Ensure player name was submitted
+            if not request.form.get("playerauction"):
+                return apology("Must provide player name.")
+
+            # Ensure year was submitted
+            if not request.form.get("yearauction"):
+                return apology("Must provide year.")
+
+            if not request.form.get("value"):
+                return apology("Must provide value.")
+
+            # Check if card exists with their username, playername, and year
+            cur.execute("SELECT COUNT(playerID) FROM Cards WHERE username = ? AND fullName = ? AND year = ?", (session["user_id"], request.form.get("playerauction"), request.form.get("yearauction"),))
+            if int(cur.fetchone()[0]) == 0:
+                return apology("You do not own this card.")
+
+            cur.execute("UPDATE Cards SET auctionPrice = ?, status = '1' WHERE username = ? AND fullName = ? AND year = ?", (request.form.get("value"), session["user_id"], request.form.get("playerauction"), request.form.get("yearauction"),))
+            con.commit()
+
+            cur.execute("SELECT position FROM Cards WHERE username = ? AND fullName = ? AND year = ?", (session["user_id"], request.form.get("playerauction"), request.form.get("yearauction"),))
+            position = int(cur.fetchone()[0])
+
+            if position == 1:
+                # batting
+                cur.execute("UPDATE Batting SET auctionValue = 'For Sale: ' || PRINTF('$%.2f', ?) WHERE fullName = ? AND yearID = ?", (request.form.get("value"), request.form.get("playerauction"), request.form.get("yearauction"),))
+                con.commit()
+            else:
+                # pitching
+                cur.execute("UPDATE Pitching SET auctionValue = 'For Sale: ' || PRINTF('$%.2f', ?) WHERE fullName = ? AND yearID = ?", (request.form.get("value"), request.form.get("playerauction"), request.form.get("yearauction"),))
+                con.commit()
+
+            return redirect("/mycards")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -140,9 +171,9 @@ def buy():
 
              # updates status to mean owned for whichever table the card resides in
              if selected[3] == 1:
-                 cur.execute("UPDATE Batting SET status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
+                 cur.execute("UPDATE Batting SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
              else:
-                 cur.execute("UPDATE Pitching SET status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
+                 cur.execute("UPDATE Pitching SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
              con.commit()
 
              return redirect("/mycards")
@@ -171,16 +202,15 @@ def mycards():
         batters = []
         pitchers = []
 
-        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 1", (session["user_id"],))
+        cur.execute("SELECT playerID, year, status FROM Cards WHERE username = ? AND position = 1", (session["user_id"],))
         batterInfo = list(cur.fetchall())
 
-        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 0", (session["user_id"],))
+        cur.execute("SELECT playerID, year, status FROM Cards WHERE username = ? AND position = 0", (session["user_id"],))
         pitcherInfo = list(cur.fetchall())
 
         for i in range(len(batterInfo)):
             cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (batterInfo[i][0], batterInfo[i][1],))
             batters.append(list(cur.fetchall()))
-
         
         for i in range(len(pitcherInfo)):
             cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
@@ -191,6 +221,8 @@ def mycards():
 
         cur.execute("SELECT COUNT(*) FROM Cards WHERE username = ?", (session["user_id"],))
         cardCount = int(cur.fetchone()[0])
+
+        
         
         return render_template("mycards.html", batters=batters, pitchers=pitchers, cash=cash, cardCount=cardCount, username=session["user_id"])
 
@@ -218,7 +250,7 @@ def search():
                 playerID = cur.fetchone()[0]
                 return generate_card(playerID, 1)
             else:
-                return apology("Not a valid player name.")
+                return apology("Not a valid batter.")
 
         elif option == 2:
             cur.execute("SELECT COUNT(*) FROM Pitching WHERE LOWER(fullName) LIKE LOWER(?)", (search,))
@@ -229,7 +261,7 @@ def search():
                 playerID = cur.fetchone()[0]
                 return generate_card(playerID, 0)
             else:
-                return apology("Not a valid player name.")
+                return apology("Not a valid pitcher.")
         else:
             cur.execute("SELECT COUNT(*) FROM Users WHERE LOWER(username) LIKE LOWER(?)", (search,))
             count = float(cur.fetchone()[0])

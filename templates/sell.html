@@ -7,22 +7,10 @@
 {% block main %}
 <!-- I don't know if the line below's syntax is legal -->
 <h1> {{ username }}'s Information</h1>
-<table class="table tablestriped">
-    <thead>
-        <tr>
-            <th class="text-start"># of Cards</th>
-            <th class="text-start">Cash Stores</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-        <!-- this would either require updating the users table (very doable, but maybe unnecessary
-            or somehow passing in extra info)-->
-            <td class="text-start">{{ cardCount }} </td>
-            <td class="text-start">{{ cash | usd }} </td>
-        </tr>
-    </tbody>
-</table>
+<br>
+<h5># of Cards: {{ cardCount }} Cash Stores: {{ cash | usd }}</h5>
+<br>
+
 <br>
 <h2>Sell cards</h2>
 <h4>Type in player name and year to sell card back to market.</h4>
@@ -41,13 +29,13 @@ h4>Type in player name, year, and price valuation to mark as available for sale.
 <br>
 <form action="/sell" method="post">
   <div class="mb-3">
-      <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="playerauction" name="playersell" placeholder="Player name" type="text">
+      <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="playerauction" name="playerauction" placeholder="Player name" type="text">
   </div>
   <div class="mb-3">
     <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="yearauction" name="yearauction" placeholder="Year" type="number">
   </div>
   <div class="mb-3">
-    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="value" name="value" placeholder="Value" type="number">
+    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="value" name="value" placeholder="Value" type="number" min=0>
   </div>
   <button name="auction" class="btn btn-danger" type="submit">Place for sale</button>
 </form>
@@ -74,6 +62,8 @@ h4>Type in player name, year, and price valuation to mark as available for sale.
         </div>
         <p class="card-text">{{ batter[0][16] }}</p>
         <p class="card-text">{{ batter[0][17] | usd }}</p>
+        <p class="card-text">Market Value: {{ batter[0][17] | usd }}</p>
+        <p class="card-text">{{ batter[0][19] }}</p>
       </div>
   </div>
   <br> <br>
@@ -100,6 +90,8 @@ h4>Type in player name, year, and price valuation to mark as available for sale.
       </div>
       <p class="card-text">{{ pitcher[0][22] }}</p>
       <p class="card-text">{{ pitcher[0][23] | usd }}</p>
+      <p class="card-text">Market Value: {{ pitcher[0][23] | usd }}</p>
+      <p class="card-text">{{ pitcher[0][25] }}</p>
     </div>
   </div>
   <br> <br>

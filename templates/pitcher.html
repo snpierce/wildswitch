@@ -23,10 +23,11 @@
           <p class="card-text">HBP: {{ pitcher[19] }}</p>
         </div>
         <p class="card-text">{{ pitcher[22] }}</p>
-        <p class="card-text">{{ pitcher[23] | usd }}</p>
+        <p class="card-text">Market Value: {{ pitcher[23] | usd }}</p>
+        <p class="card-text">{{ pitcher[25] }}</p>
+        </div>
       </div>
+      {% endfor %}
     </div>
-    <br> <br>
-    {% endfor %}
-</div>
+    <br><br>
 {% endblock %}

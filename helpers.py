@@ -31,14 +31,14 @@ def apology(message, code=400):
 def generate_card(playerID, command):
     if command == 1:
         cur.execute("SELECT * FROM Batting WHERE playerID = ?", (playerID,))
-        players = list(cur.fetchall())
-
-        return render_template("batter.html", batters=players)
+        batters = list(cur.fetchall())
+        
+        return render_template("batter.html", batters=batters)
     else:
         cur.execute("SELECT * FROM Pitching WHERE playerID = ?", (playerID,))
-        players = list(cur.fetchall())
+        pitchers = list(cur.fetchall())
 
-        return render_template("pitcher.html", pitchers=players)
+        return render_template("pitcher.html", pitchers=pitchers)
     
 
 # generates and returns list of searched user's owned player cards

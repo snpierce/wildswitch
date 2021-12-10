@@ -5,24 +5,12 @@
 {% endblock %}
 
 {% block main %}
-<!-- I don't know if the line below's syntax is legal -->
+
 <h1> {{ username }}'s Information</h1>
-<table class="table tablestriped">
-    <thead>
-        <tr>
-            <th class="text-start"># of Cards</th>
-            <th class="text-start">Cash Stores</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-        <!-- this would either require updating the users table (very doable, but maybe unnecessary
-            or somehow passing in extra info)-->
-            <td class="text-start">{{ cardCount }} </td>
-            <td class="text-start">{{ cash | usd }} </td>
-        </tr>
-    </tbody>
-</table>
+<br>
+<h5># of Cards: {{ cardCount }} Cash Stores: {{ cash | usd }}</h5>
+<br>
+
 <br>
 <h2>Batters</h2>
 <div class="row">
@@ -43,7 +31,8 @@
           <p class="card-text">RBIs: {{ batter[0][12] }}</p>
         </div>
         <p class="card-text">{{ batter[0][16] }}</p>
-        <p class="card-text">{{ batter[0][17] | usd }}</p>
+        <p class="card-text">Market Value: {{ batter[0][17] | usd }}</p>
+        <p class="card-text">{{ batter[0][19] }}</p>
       </div>
   </div>
   <br> <br>
@@ -68,7 +57,8 @@
         <p class="card-text">HBP: {{ pitcher[0][19] }}</p>
       </div>
       <p class="card-text">{{ pitcher[0][22] }}</p>
-      <p class="card-text">{{ pitcher[0][23] | usd }}</p>
+      <p class="card-text">Market Value: {{ pitcher[0][23] | usd }}</p>
+      <p class="card-text">{{ pitcher[0][25] }}</p>
     </div>
   </div>
   <br> <br>

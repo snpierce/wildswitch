@@ -39,7 +39,7 @@ card, p, card-header {
     color: blue;
 }
 
-h1, card-text, h2, li, input, option {
+h1, card-text, h2, h5, li, input, option {
     color: rgb(3, 3, 3);
     font-family: "Optima", sans-serif;
 }
