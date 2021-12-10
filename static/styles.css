@@ -82,7 +82,7 @@ a {
     text-align: left;
 }
 
-.form-select {
+.form-select, .form-control {
     width: 300px;
     margin: auto;
 }
@@ -90,4 +90,9 @@ a {
 .form {
     color: rgb(82, 79, 79);
     font-family: "Optima", sans-serif;
+}
+
+.table {
+    width: 60%;
+    margin: auto;
 }

@@ -40,6 +40,76 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+@app.route("/sell", methods=["GET", "POST"])
+@login_required
+def sell():
+
+    if request.method == "POST":
+
+        if 'sell' in request.form:
+
+            # Ensure player name was submitted
+            if not request.form.get("playersell"):
+                return apology("Must provide player name.")
+
+            # Ensure year was submitted
+            if not request.form.get("yearsell"):
+                return apology("Must provide year.")
+
+            # Check if card exists with their username, playername, and year
+            cur.execute("SELECT COUNT(playerID) FROM Cards WHERE username = ? AND fullName = ? AND year = ?", (session["user_id"], request.form.get("playersell"), request.form.get("yearsell"),))
+            if int(cur.fetchone()[0]) == 0:
+                return apology("You do not own this card.")
+
+            #Get value of card
+            cur.execute("SELECT cardValue FROM Cards WHERE username = ? AND fullName = ? AND year = ?", (session["user_id"], request.form.get("playersell"), request.form.get("yearsell"),)) 
+            value = cur.fetchone()[0]
+
+            #Get user's old cash
+            cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
+            cash = cur.fetchone()[0]
+
+            #Update user's cash
+            cur.execute("UPDATE Users SET cash = ? WHERE username = ?", (cash + value, session["user_id"],))
+
+            #Delete card from cards
+            cur.execute("DELETE FROM Cards WHERE username = ? AND fullName = ? AND year = ?", (session["user_id"], request.form.get("playersell"), request.form.get("yearsell"),))
+            con.commit()
+
+            return redirect("/mycards")
+
+        elif 'auction' in request.data:
+            return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        batters = []
+        pitchers = []
+
+        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 1", (session["user_id"],))
+        batterInfo = list(cur.fetchall())
+
+        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 0", (session["user_id"],))
+        pitcherInfo = list(cur.fetchall())
+
+        for i in range(len(batterInfo)):
+            cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (batterInfo[i][0], batterInfo[i][1],))
+            batters.append(list(cur.fetchall()))
+
+            
+        for i in range(len(pitcherInfo)):
+            cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
+            pitchers.append(list(cur.fetchall()))
+
+        cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
+        cash = int(cur.fetchone()[0])
+
+        cur.execute("SELECT COUNT(*) FROM Cards WHERE username = ?", (session["user_id"],))
+        cardCount = int(cur.fetchone()[0])
+            
+        return render_template("sell.html", batters=batters, pitchers=pitchers, cash=cash, cardCount=cardCount, username=session["user_id"])
+
+
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -62,9 +132,9 @@ def buy():
              return apology("Already purchased!")
          else:
              # adds bought card into cards table
-             cur.execute("INSERT INTO Cards (username, playerID, cardValue, status, position, year) VALUES (?, ?, ?, ?, ?, ?)", (session["user_id"], selected[0], selected[5], '0', selected[3], selected[2],))
+             cur.execute("INSERT INTO Cards (username, playerID, cardValue, status, position, year, fullName) VALUES (?, ?, ?, ?, ?, ?, ?)", (session["user_id"], selected[0], selected[5], '0', selected[3], selected[2], selected[1]))
              # subtracts card cost from users total cash supply
-             cur.execute("UPDATE Users SET cash = cash - ? WHERE username = ?", (selected[5], session["user_id"],))
+             cur.execute("UPDATE Users SET cash = (cash - ?) WHERE username = ?", (selected[5], session["user_id"],))
              # updates status in market to mean bought
              cur.execute("UPDATE Market SET status = '1' WHERE playerID = ?", (selected[0],))
 
@@ -94,14 +164,10 @@ def buy():
 
         return render_template("buy.html", batters=batters, pitchers=pitchers)
 
-@app.route("/mycards", methods=["GET", "POST"])
+@app.route("/mycards")
 @login_required
 def mycards():
 
-    if request.method == "POST":
-         
-         cur.execute("UPDATE Users SET cash = ? WHERE username = ?", )
-    else:
         batters = []
         pitchers = []
 
