@@ -133,3 +133,6 @@ dmypy.json
 
 # SQLite database
 .sqlite
+
+# text files
+.md
