@@ -5,6 +5,14 @@
 {% endblock %}
 
 {% block main %}
+<h4>Type in which year's card you want to buy.</h4><br>
+<form action="/search/<playerID>/<position>" method="post">
+    <div class="mb-3">
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="year" placeholder="Year" type="number">
+    </div>
+    <button name="buy" class="btn btn-danger" type="submit">Buy</button>
+</form>
+<br>
 <div class="row">
     {% for pitcher in pitchers %}
     <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">

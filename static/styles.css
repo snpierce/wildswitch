@@ -23,8 +23,6 @@ nav .navbar-brand .green
 }
 
 card, p, card-header {
-    margin-left: 5px;
-    margin-right: 5px;
     color: rgb(3, 3, 3);
     font-family: "Optima", sans-serif;
 }
@@ -92,7 +90,13 @@ a {
     font-family: "Optima", sans-serif;
 }
 
-.table {
-    width: 60%;
+.row{
     margin: auto;
+}
+
+.center{
+    margin: auto;
+    text-align: center;
+    margin-left: 80px;
+    margin-right: 80px;
 }

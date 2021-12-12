@@ -13,7 +13,10 @@
 
 <br>
 <h2>Sell cards</h2>
-<h4>Type in player name and year to sell card back to market.</h4>
+<div class="row">
+<div class="column">
+<h5 class="center">Type in player name and year to sell card back to market for market price.</h5>
+<br>
     <form action="/sell" method="post">
         <div class="mb-3">
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="playersell" placeholder="Player name" type="text">
@@ -21,11 +24,15 @@
         <div class="mb-3">
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="yearsell" placeholder="Year" type="number">
         </div>
+        <div class="text-center">
         <button name="sell" class="btn btn-danger" type="submit">Sell</button>
+        </div>
     </form>
 <br>
+</div>
 
-h4>Type in player name, year, and price valuation to mark as available for sale.</h4>
+<div class="column">
+<h5 class="center">Type in player name, year, and price valuation to mark as available for sale.</h5>
 <br>
 <form action="/sell" method="post">
   <div class="mb-3">
@@ -37,10 +44,14 @@ h4>Type in player name, year, and price valuation to mark as available for sale.
   <div class="mb-3">
     <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="value" name="value" placeholder="Value" type="number" min=0>
   </div>
+  <div class="text-center">
   <button name="auction" class="btn btn-danger" type="submit">Place for sale</button>
+</div>
 </form>
 <br>
-
+</div>
+</div>
+<br><br>
 
 <h2>Batters</h2>
 <div class="row">

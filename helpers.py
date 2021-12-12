@@ -26,19 +26,6 @@ def login_required(f):
 # I guess we'll keep for now while we're working, but we can change it.
 def apology(message, code=400):
     return render_template("apology.html", message=message), code
-
-# generates and returns player information when searched
-def generate_card(playerID, command):
-    if command == 1:
-        cur.execute("SELECT * FROM Batting WHERE playerID = ?", (playerID,))
-        batters = list(cur.fetchall())
-        
-        return render_template("batter.html", batters=batters)
-    else:
-        cur.execute("SELECT * FROM Pitching WHERE playerID = ?", (playerID,))
-        pitchers = list(cur.fetchall())
-
-        return render_template("pitcher.html", pitchers=pitchers)
     
 
 # generates and returns list of searched user's owned player cards
@@ -61,13 +48,8 @@ def generate_user(username):
             cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
             pitchers.append(list(cur.fetchall()))
 
-        cur.execute("SELECT cash FROM Users WHERE username = ?", (username,))
-        cash = int(cur.fetchone()[0])
-
-        cur.execute("SELECT COUNT(*) FROM Cards WHERE username = ?", (username,))
-        cardCount = int(cur.fetchone()[0])
         
-        return render_template("mycards.html", batters=batters, pitchers=pitchers, cash=cash, cardCount=cardCount, username=username)
+        return render_template("usersearch.html", batters=batters, pitchers=pitchers, username=username)
 
 # converts amount into usd format
 def usd(amount):

@@ -5,6 +5,14 @@
 {% endblock %}
 
 {% block main %}
+  <h4>Type in which year's card you want to buy.</h4><br>
+      <form action="/search/<playerID>/<position>" method="post">
+          <div class="mb-3">
+              <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="year" name="year" placeholder="Year" type="number">
+          </div>
+          <button name="buy" class="btn btn-danger" type="submit">Buy</button>
+      </form>
+  <br>
     <div class="row">
         {% for batter in batters %}
         <div class="card bg-light mb-3" style="max-width: 18rem; margin: 20px;">
@@ -17,7 +25,7 @@
                 <p class="card-text">Runs: {{ batter[7] }}  </p>
               </div>
               <div class="column">
-                <p class="card-text">At Bats: {{ batter[6] }}</p>
+                <p class="card-text">BA: {{ batter[6] }}</p>
                 <p class="card-text">Doubles: {{ batter[9] }}</p>
                 <p class="card-text">HR: {{ batter[11] }}</p>
                 <p class="card-text">RBIs: {{ batter[12] }}</p>
