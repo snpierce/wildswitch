@@ -280,19 +280,49 @@ def search():
                 cur.execute("SELECT username FROM Users WHERE LOWER(username) LIKE LOWER(?)", (search,))
                 username = cur.fetchone()[0]
 
-                return generate_user(username)
+                return redirect(url_for('search_user', username=username))
             else:
                 return apology("Not a valid username.")
     else:
         
         cur.execute("DELETE FROM Search")
+        cur.execute("DELETE FROM SearchUser")
         con.commit()
 
         return render_template("search.html")
 
 
-@app.route("/search/<user>", methods=["GET", "POST"])
+@app.route("/search/<username>", methods=["GET", "POST"])
 def search_user(username):
+    
+    if request.method == "POST":
+        
+
+        return redirect("/mycards")
+    else:
+        cur.execute("INSERT INTO SearchUser (username) VALUES (?)", (username,))
+        con.commit()
+
+        batters = []
+        pitchers = []
+
+        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 1", (username,))
+        batterInfo = list(cur.fetchall())
+
+        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 0", (username,))
+        pitcherInfo = list(cur.fetchall())
+
+        for i in range(len(batterInfo)):
+            cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (batterInfo[i][0], batterInfo[i][1],))
+            batters.append(list(cur.fetchall()))
+
+        
+        for i in range(len(pitcherInfo)):
+            cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
+            pitchers.append(list(cur.fetchall()))
+
+        
+        return render_template("usersearch.html", batters=batters, pitchers=pitchers, username=username)
 
 
 @app.route("/search/<playerID>/<position>", methods=["GET", "POST"])
