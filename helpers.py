@@ -4,11 +4,14 @@ import urllib.parse
 import sqlite3
 
 from datetime import date
-from flask import redirect, render_template, request, session
+from flask import redirect, render_template, request, session, g
 from functools import wraps
 
-con = sqlite3.connect("wildswitch.sqlite", check_same_thread=False)
-cur = con.cursor()
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect("wildswitch.sqlite", check_same_thread=False)
+    return db
 
 # Copied and pasted from PSet9 Finance
 def login_required(f):
@@ -30,6 +33,8 @@ def apology(message, code=400):
 
 # generates and returns list of searched user's owned player cards
 def generate_user(username):
+        cur = get_db().cursor()
+
         batters = []
         pitchers = []
 
@@ -48,7 +53,6 @@ def generate_user(username):
             cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
             pitchers.append(list(cur.fetchall()))
 
-        
         return render_template("usersearch.html", batters=batters, pitchers=pitchers, username=username)
 
 # converts amount into usd format
@@ -60,9 +64,11 @@ def usd(amount):
 # command 0 creates a random list of 8 players and stores that group until called with command 0 again
 # command 1 returns the currently stored list
 def build_market():
+    cur = get_db().cursor()
+
      # clears previous market
     cur.execute("DELETE FROM Market")
-    con.commit()
+    get_db().commit()
 
     # initialize players
     cur.execute("SELECT * FROM Pitching WHERE status = '0' ORDER BY RANDOM() LIMIT 4")
@@ -77,7 +83,7 @@ def build_market():
     for i in range(4):
         cur.execute("INSERT INTO Market (playerID, fullName, year, position, status, value) VALUES (?, ?, ?, 1, ?, ?)", (batterGroup[i][0], batterGroup[i][2], batterGroup[i][1], batterGroup[i][18], batterGroup[i][17],))
 
-    con.commit()
+    get_db().commit()
 
 
         

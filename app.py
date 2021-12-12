@@ -3,13 +3,13 @@ import datetime
 import sqlite3
 import jinja2
 
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for, g
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, generate_user, usd, build_market
+from helpers import apology, login_required, generate_user, usd, build_market, get_db
 
 # Configure application
 app = Flask(__name__)
@@ -26,10 +26,13 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# opens connection to database
-con = sqlite3.connect("wildswitch.sqlite", check_same_thread=False)
-cur = con.cursor()
 
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 
 @app.after_request
@@ -40,9 +43,11 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
+    cur = get_db().cursor()
 
     if request.method == "POST":
 
@@ -76,15 +81,15 @@ def sell():
 
             #Delete card from cards
             cur.execute("DELETE FROM Cards WHERE username = ? AND fullName = ? AND year = ?", (session["user_id"], request.form.get("playersell"), request.form.get("yearsell"),))
-            con.commit()
+            get_db().commit()
 
             #Update status in pitching/batting
             if position == 0:
                 cur.execute("UPDATE Pitching SET status = 0, auctionValue = 'For Sale' WHERE fullName=? AND yearID=?", (request.form.get("playersell"), request.form.get("yearsell"),))
-                con.commit()
+                get_db().commit()
             else:
                 cur.execute("UPDATE Batting SET status = 0, auctionValue = 'For Sale' WHERE fullName=? AND yearID=?", (request.form.get("playersell"), request.form.get("yearsell"),))
-                con.commit()
+                get_db().commit()
 
             return redirect("/mycards")
 
@@ -106,7 +111,7 @@ def sell():
                 return apology("You do not own this card.")
 
             cur.execute("UPDATE Cards SET auctionPrice = ?, status = '1' WHERE username = ? AND fullName = ? AND year = ?", (request.form.get("value"), session["user_id"], request.form.get("playerauction"), request.form.get("yearauction"),))
-            con.commit()
+            get_db().commit()
 
             cur.execute("SELECT position FROM Cards WHERE username = ? AND fullName = ? AND year = ?", (session["user_id"], request.form.get("playerauction"), request.form.get("yearauction"),))
             position = int(cur.fetchone()[0])
@@ -114,11 +119,11 @@ def sell():
             if position == 1:
                 # batting
                 cur.execute("UPDATE Batting SET auctionValue = 'For Auction: ' || PRINTF('$%.2f', ?) WHERE fullName = ? AND yearID = ?", (request.form.get("value"), request.form.get("playerauction"), request.form.get("yearauction"),))
-                con.commit()
+                get_db().commit()
             else:
                 # pitching
                 cur.execute("UPDATE Pitching SET auctionValue = 'For Auction: ' || PRINTF('$%.2f', ?) WHERE fullName = ? AND yearID = ?", (request.form.get("value"), request.form.get("playerauction"), request.form.get("yearauction"),))
-                con.commit()
+                get_db().commit()
 
             return redirect("/mycards")
 
@@ -147,7 +152,8 @@ def sell():
 
         cur.execute("SELECT COUNT(*) FROM Cards WHERE username = ?", (session["user_id"],))
         cardCount = int(cur.fetchone()[0])
-            
+
+
         return render_template("sell.html", batters=batters, pitchers=pitchers, cash=cash, cardCount=cardCount, username=session["user_id"])
 
 
@@ -155,6 +161,7 @@ def sell():
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
+    cur = get_db().cursor()
 
     if request.method == "POST":
 
@@ -184,7 +191,7 @@ def buy():
                  cur.execute("UPDATE Batting SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
              else:
                  cur.execute("UPDATE Pitching SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
-             con.commit()
+             get_db().commit()
 
              return redirect("/mycards")
 
@@ -202,6 +209,7 @@ def buy():
             else:
                 cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (market[i][0], market[i][1],))
                 pitchers.append(cur.fetchone())
+        
 
         return render_template("buy.html", batters=batters, pitchers=pitchers)
 
@@ -209,6 +217,7 @@ def buy():
 @app.route("/mycards")
 @login_required
 def mycards():
+        cur = get_db().cursor()
 
         batters = []
         pitchers = []
@@ -233,6 +242,7 @@ def mycards():
         cur.execute("SELECT COUNT(*) FROM Cards WHERE username = ?", (session["user_id"],))
         cardCount = int(cur.fetchone()[0])
 
+
         return render_template("mycards.html", batters=batters, pitchers=pitchers, cash=cash, cardCount=cardCount, username=session["user_id"])
 
 
@@ -246,6 +256,7 @@ def index():
 @app.route("/search", methods=["GET", "POST"])
 @login_required
 def search():
+    cur = get_db().cursor()
     
     if request.method == "POST":
         search = request.form.get("search")
@@ -279,7 +290,6 @@ def search():
             if count != 0.0:
                 cur.execute("SELECT username FROM Users WHERE LOWER(username) LIKE LOWER(?)", (search,))
                 username = cur.fetchone()[0]
-
                 return redirect(url_for('search_user', username=username))
             else:
                 return apology("Not a valid username.")
@@ -287,21 +297,21 @@ def search():
         
         cur.execute("DELETE FROM Search")
         cur.execute("DELETE FROM SearchUser")
-        con.commit()
+        get_db().commit()
 
         return render_template("search.html")
 
 
 @app.route("/search/<username>", methods=["GET", "POST"])
 def search_user(username):
+    cur = get_db().cursor()
     
     if request.method == "POST":
-        
 
         return redirect("/mycards")
     else:
         cur.execute("INSERT INTO SearchUser (username) VALUES (?)", (username,))
-        con.commit()
+        get_db().commit()
 
         batters = []
         pitchers = []
@@ -321,12 +331,12 @@ def search_user(username):
             cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
             pitchers.append(list(cur.fetchall()))
 
-        
         return render_template("usersearch.html", batters=batters, pitchers=pitchers, username=username)
 
 
 @app.route("/search/<playerID>/<position>", methods=["GET", "POST"])
 def search_player(playerID, position):
+    cur = get_db().cursor()
 
     if request.method == "POST":
 
@@ -355,7 +365,7 @@ def search_player(playerID, position):
             selected = cur.fetchone()
 
         if count == 0:
-                return apology("Not a valid year.")
+            return apology("Not a valid year.")
 
         cur.execute("SELECT COUNT(*), auctionPrice, status FROM Cards WHERE playerID = ? AND year = ?", (player_id, year,))
         check_owned = cur.fetchone()[0]
@@ -387,7 +397,7 @@ def search_player(playerID, position):
 
                     cur.execute("UPDATE Users SET cash = (cash + ?) WHERE username = ?", (value, info[0][2],))
 
-                    con.commit()
+                    get_db().commit()
 
                     return redirect("/mycards")
         else:
@@ -395,7 +405,7 @@ def search_player(playerID, position):
 
 
         if value > cash:
-             return apology("Can't afford - please add money to account.")
+            return apology("Can't afford - please add money to account.")
         else:
              # adds bought card into cards table
              cur.execute("INSERT INTO Cards (username, playerID, cardValue, status, position, year, fullName) VALUES (?, ?, ?, ?, ?, ?, ?)", (session["user_id"], selected[0], value, '0', pos, selected[2], selected[3]))
@@ -407,24 +417,23 @@ def search_player(playerID, position):
                  cur.execute("UPDATE Batting SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
              else:
                  cur.execute("UPDATE Pitching SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
-             con.commit()
+             
+             get_db().commit()
 
              return redirect("/mycards")
 
     else:
 
         cur.execute("INSERT INTO Search (playerID, position) VALUES (?, ?)", (playerID, position,))
-        con.commit()
+        get_db().commit()
 
         if position == 0:
             cur.execute("SELECT * FROM Pitching WHERE playerID = ?", (playerID,))
             pitchers = list(cur.fetchall())
-
             return render_template("pitcher.html", pitchers=pitchers)
         else:
             cur.execute("SELECT * FROM Batting WHERE playerID = ?", (playerID,))
             batters = list(cur.fetchall())
-
             return render_template("batter.html", batters=batters)
 
 
@@ -435,6 +444,8 @@ def login():
 
     # Forget any user_id
     session.clear()
+
+    cur = get_db().cursor()
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
@@ -486,6 +497,8 @@ def register():
 
     session.clear()
 
+    cur = get_db().cursor()
+
     # when register button is clicked
     if request.method == "POST":
 
@@ -514,7 +527,7 @@ def register():
 
         # if passes all the checks, add username+hash to users table
         cur.execute("INSERT INTO Users (username, password, cash) VALUES (?, ?, 50.00)", (request.form.get("username"), hash,))
-        con.commit()
+        get_db().commit()
 
         # return users info for now registered user by searching for username
         cur.execute("SELECT * FROM Users WHERE username = ?", (request.form.get("username"),))
