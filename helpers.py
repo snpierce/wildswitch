@@ -1,12 +1,11 @@
-import os
-import requests
-import urllib.parse
 import sqlite3
 
-from datetime import date
-from flask import redirect, render_template, request, session, g
+from flask import redirect, render_template, session, g
 from functools import wraps
 
+
+# also taken from https://flask.palletsprojects.com/en/2.0.x/patterns/sqlite3/ as helper 
+# function to either open or check if connection is open
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -26,40 +25,17 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# I guess we'll keep for now while we're working, but we can change it.
+# apology template that prints parameter message
 def apology(message, code=400):
     return render_template("apology.html", message=message), code
     
 
-# generates and returns list of searched user's owned player cards
-def generate_user(username):
-        cur = get_db().cursor()
-
-        batters = []
-        pitchers = []
-
-        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 1", (username,))
-        batterInfo = list(cur.fetchall())
-
-        cur.execute("SELECT playerID, year FROM Cards WHERE username = ? AND position = 0", (username,))
-        pitcherInfo = list(cur.fetchall())
-
-        for i in range(len(batterInfo)):
-            cur.execute("SELECT * FROM Batting WHERE playerID = ? AND yearID = ?", (batterInfo[i][0], batterInfo[i][1],))
-            batters.append(list(cur.fetchall()))
-
-        
-        for i in range(len(pitcherInfo)):
-            cur.execute("SELECT * FROM Pitching WHERE playerID = ? AND yearID = ?", (pitcherInfo[i][0], pitcherInfo[i][1],))
-            pitchers.append(list(cur.fetchall()))
-
-        return render_template("usersearch.html", batters=batters, pitchers=pitchers, username=username)
-
-# converts amount into usd format
+# converts amount into usd format (from finance)
 def usd(amount):
     """Format value as USD."""
     value = float(amount)
     return f"${value:,.2f}"
+
 
 # command 0 creates a random list of 8 players and stores that group until called with command 0 again
 # command 1 returns the currently stored list
