@@ -174,10 +174,10 @@ def buy():
          players = list(cur.fetchall())
          selected = players[player]
 
-         if selected[5] > cash:
-             return apology("Can't afford - please add money to account.")
-         elif selected[4] == 1:
+         if selected[4] == 1:
              return apology("Already purchased!")
+         elif selected[5] > cash:
+             return apology("Can't afford - please add money to account.")
          else:
              # adds bought card into cards table
              cur.execute("INSERT INTO Cards (username, playerID, cardValue, status, position, year, fullName) VALUES (?, ?, ?, ?, ?, ?, ?)", (session["user_id"], selected[0], selected[5], '0', selected[3], selected[2], selected[1]))
@@ -308,7 +308,59 @@ def search_user(username):
     
     if request.method == "POST":
 
-        return redirect("/mycards")
+        if not request.form.get("player"):
+            return apology("Please enter player.")
+        if not request.form.get("year"):
+            return apology("Please enter year.")
+
+        player = request.form.get("player")
+        year = request.form.get("year")
+
+        cur.execute("SELECT * FROM SearchUser")
+        rows = cur.fetchall()
+        user = rows[0][0]
+
+        cur.execute("SELECT COUNT(*) FROM Cards WHERE username = ? AND fullName=? AND year=?", (user, player, year,))
+        count = cur.fetchall()[0][0]
+
+        if count == 0:
+            return apology("Invalid card information or this user does not own requested card.")
+        
+        cur.execute("SELECT status, position FROM Cards WHERE username = ? AND fullName=? AND year=?", (user, player, year,))
+        info = cur.fetchall()
+        status = info[0][0]
+        position = info[0][1]
+
+        cur.execute("SELECT cash FROM Users WHERE username = ?", (session["user_id"],))
+        cash = int(cur.fetchone()[0])
+
+        if status == 0:
+            return apology("Card not for sale.")
+        else:
+            cur.execute("SELECT auctionPrice FROM Cards WHERE username = ? AND fullName=? AND year=?", (user, player, year,))
+            value = cur.fetchone()[0]
+
+            if value > cash:
+                return apology("You cannot afford to purchase this card.")
+            
+            else:
+                # adds bought card into cards table
+                cur.execute("UPDATE Cards SET username = ?, status = 0, auctionPrice = NULL WHERE fullName = ? AND year = ?", (session["user_id"], player, year,))
+                # subtracts card cost from users total cash supply
+                cur.execute("UPDATE Users SET cash = (cash - ?) WHERE username = ?", (value, session["user_id"],))
+
+                # updates status to mean owned for whichever table the card resides in
+                if position == 1:
+                    cur.execute("UPDATE Batting SET auctionValue = 'Not For Sale', status = '1' WHERE fullName = ? AND yearID = ?", (player, year,))
+                else:
+                    cur.execute("UPDATE Pitching SET auctionValue = 'Not For Sale', status = '1' WHERE fullName = ? AND yearID = ?", (player, year,))
+
+                cur.execute("UPDATE Users SET cash = (cash + ?) WHERE username = ?", (value, user,))
+
+                get_db().commit()
+
+                return redirect("/mycards")
+
     else:
         cur.execute("INSERT INTO SearchUser (username) VALUES (?)", (username,))
         get_db().commit()
@@ -343,7 +395,7 @@ def search_player(playerID, position):
         cur.execute("SELECT * FROM Search")
         rows = cur.fetchall()
         player_id = rows[0][0]
-        pos = int(rows[0][1])
+        pos = rows[0][1]
 
         if not request.form.get("year"):
             return apology("Please enter year.")
@@ -367,7 +419,7 @@ def search_player(playerID, position):
         if count == 0:
             return apology("Not a valid year.")
 
-        cur.execute("SELECT COUNT(*), auctionPrice, status FROM Cards WHERE playerID = ? AND year = ?", (player_id, year,))
+        cur.execute("SELECT COUNT(*) FROM Cards WHERE playerID = ? AND year = ?", (player_id, year,))
         check_owned = cur.fetchone()[0]
  
         if check_owned == 1:
@@ -391,9 +443,9 @@ def search_player(playerID, position):
 
                     # updates status to mean owned for whichever table the card resides in
                     if pos== 1:
-                        cur.execute("UPDATE Batting SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
+                        cur.execute("UPDATE Batting SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2],))
                     else:
-                        cur.execute("UPDATE Pitching SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2]))
+                        cur.execute("UPDATE Pitching SET auctionValue = 'Not For Sale', status = '1' WHERE playerID = ? AND yearID = ?", (selected[0], selected[2],))
 
                     cur.execute("UPDATE Users SET cash = (cash + ?) WHERE username = ?", (value, info[0][2],))
 
@@ -424,10 +476,12 @@ def search_player(playerID, position):
 
     else:
 
-        cur.execute("INSERT INTO Search (playerID, position) VALUES (?, ?)", (playerID, position,))
+        int_position = int(position)
+
+        cur.execute("INSERT INTO Search (playerID, position) VALUES (?, ?)", (playerID, int_position,))
         get_db().commit()
 
-        if position == 0:
+        if int_position == 0:
             cur.execute("SELECT * FROM Pitching WHERE playerID = ?", (playerID,))
             pitchers = list(cur.fetchall())
             return render_template("pitcher.html", pitchers=pitchers)

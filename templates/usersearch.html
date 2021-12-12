@@ -8,13 +8,13 @@
 
 <h1> {{ username }}'s Information</h1>
 
-<h4>Type in which player and year you want to buy.</h4><br>
+<h5>Type in which player and year you want to buy.</h5><br>
       <form action="/search/<username>" method="post">
           <div class="mb-3">
-              <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="year" name="year" placeholder="Player" type="text">
+              <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="player" name="player" placeholder="Player" type="text">
           </div>
           <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="year" name="year" placeholder="Player" type="text">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="year" name="year" placeholder="Year" type="text">
             </div>
           <button name="buy" class="btn btn-danger" type="submit">Buy</button>
       </form>
