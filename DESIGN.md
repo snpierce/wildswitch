@@ -1,4 +1,4 @@
-Our design can be split into a few parts. There is a SQL database, the app.py file, which contains the code to make the app work, the helpers file, from which functions are called in app.py, the layout page for the html, and the html pages themselves. This file will go over the design decisions that we made while coding each of them.
+The link to a Google Drive with our files/zip is https://drive.google.com/file/d/1UZBGOEzANUkE2sHccKtSw-3ztNWQnYun/view?usp=sharing. Our design can be split into a few parts. There is a SQL database, the app.py file, which contains the code to make the app work, the helpers file, from which functions are called in app.py, the layout page for the html, and the html pages themselves. This file will go over the design decisions that we made while coding each of them.
 
 #
 #
