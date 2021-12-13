@@ -1,9 +1,5 @@
 COMPILING AND CONFIGURING:
-<<<<<<< HEAD
-Our website is available at the url https://wild-switch.herokuapp.com/. You can go here to view and test the site. The link to our Youtube video is https://www.youtube.com/watch?v=duVg66zT2fM. The link to our repository, where all of our files are kept, is https://github.com/snpierce/wildswitch. We had too many files to upload and read on Ed that linking the GitHub repository would work. Below are instructions on how to use the site and what to test for. Feel free to explore more if there is anything you are interested in or curious about. 
-=======
 Our website is available at the url https://wild-switch.herokuapp.com/. You can go here to view and test the site. The link to our Youtube video is https://www.youtube.com/watch?v=duVg66zT2fM. You can see our files at https://github.com/snpierce/wildswitch. We saw on Ed that we can upload just the README and DESIGN files and link to our GitHub repository if necessary, so we chose to do that. Below are instructions on how to use the site and what to test for. Feel free to explore more if there is anything you are interested in or curious about. 
->>>>>>> 470216248c9d4565d1d0c75e625e4248c4be15e8
 
 A BRIEF NOTE ABOUT PLAYER DATABASE:
 First, credit to http://www.seanlahman.com/baseball-archive/statistics/ for the data. Second, we have trimmed the data as follows. We started with data going back to 1900. We excluded everybody before 1960 who is not in the Hall of Fame. We excluded everybody before 1980 who was not an all-star. Realistically, we believe that the farther we go back, non-elite players become less relevant. We then needed a way to sift through players who did not record meaningful statistics in a given season. Batters had to meet this standard: At-Bats ≥ 130 and Games ≥ 50. Pitchers had to meet this standard: Games ≥ 10 AND Batters Faced ≥ 100. Just in case you search for an obscure player from 1920 and wonder why he's not there.
