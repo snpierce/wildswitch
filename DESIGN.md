@@ -5,7 +5,7 @@ Our design can be split into a few parts. There is a SQL database, the app.py fi
 #
 # SQL database
 
-We used 11 tables within our data 7 of which we continue to use to run the app. Those four are Batting, Pitching, Cards, Users, Market, Search and SearchUser.
+Through DB Browser for Sqlite, we created 11 tables within our data, 7 of which we continue to use to run the app. Those seven are Batting, Pitching, Cards, Users, Market, Search and SearchUser.
 Users stores every user's unique id, username, hashed password, and cash values.
 Cards stores the playerID, fullName, position (0 or 1 for batter or pitcher), status (0 or 1 for for sale or not for sale) and username of the owner). Note that not every player is in the cards file. Only the players whose cards' are currently owned.
 Batting and Pitching store the names, playerIDs, years, teamID, and other relevant stat for every player in our database. 
